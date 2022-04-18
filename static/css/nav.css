@@ -1,0 +1,47 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "proxima-nova", Sans-serif;
+}
+
+body {
+    margin: 0 50px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    background: #18596D;
+}
+
+nav li.user {
+    flex-grow: 1;
+    text-align: center;
+}
+
+nav li.nav-icon{
+    margin:0 30px;
+    flex-grow: 0;
+}
+
+nav img {
+    height: 40px;
+}
+
+.guest{
+}
+
+.nav-link {
+    text-decoration: none;
+    padding: 20px 30px;
+    display: block;
+    color: white;
+    font-weight: bold;
+}
+
+.nav-link:hover {
+    color: #FC6620;
+    background: white;
+    transition: 0.3s;
+}
