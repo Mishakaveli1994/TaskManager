@@ -12,11 +12,35 @@
     {% block css %}{% endblock css %}
     <title>{% block title %}{% endblock title %}</title>
 </head>
+
 <body>
 {% include 'nav.html' %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">
+                {{ message|safe }}
+                <a href="#" class="close">X</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 {% block content %}
 {% endblock content %}
 </body>
+<script>
+    window.onload = function () {
+        let close = document.querySelectorAll('.close');
+
+        [...close].map(e => e.addEventListener('click', closeBtn))
+
+        function closeBtn(ev) {
+            console.log(ev.target)
+            ev.preventDefault();
+            ev.target.parentElement.remove()
+        }
+    }
+</script>
 {% block script %}
 {% endblock script %}
 </html>

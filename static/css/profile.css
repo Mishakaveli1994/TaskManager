@@ -1,0 +1,36 @@
+.container{
+    display: flex;
+    padding: 20px 0 0 20px;
+    height: 50vh;
+    background:#1F596C;
+}
+
+.picture{
+    padding-right: 30px;
+}
+
+.picture img{
+    border-radius: 100px;
+}
+
+.info{
+    padding-top: 30px;
+}
+
+.info p{
+    padding: 5px 0;
+    color: white;
+}
+
+.profile-links{
+    display: flex;
+    flex-direction: row;
+}
+
+.profile-links a{
+    text-decoration: none;
+    padding-right: 10px;
+    padding-top: 20px;
+    font-weight: bold;
+    color: #FC6620;
+}

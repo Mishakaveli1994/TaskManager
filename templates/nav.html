@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load auth_filter %}
 <nav>
     <div id="nav-bar">
         <div class="icon">
@@ -9,11 +9,26 @@
             <div class="user-content">
                 <p class="user-name">Hello {{ user.first_name }}!</p>
                 <ul>
-                    <li class="user {% if section == 'dashboard' %}selected{% endif %}"><a class="nav-link" href="">Dashboard</a></li>
-                    <li class="user {% if section == 'projects' %}selected{% endif %}"><a class="nav-link" href="">Projects</a></li>
-                    <li class="user {% if section == 'create' %}selected{% endif %}"><a class="nav-link" href="">Create</a></li>
+                    <li class="user {% if section == 'dashboard' %}selected{% endif %}"><a class="nav-link"
+                                                                                           href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="user {% if section == 'projects' %}selected{% endif %}"><a class="nav-link"
+                                                                                          href="{% url 'projects' %}">Projects</a>
+                    </li>
+                    {% if request.user|has_group:"Manager" or request.user|has_group:"Admin" %}
+                        <li class="user {% if section == 'create_task' %}selected{% endif %}"><a class="nav-link"
+                                                                                                 href="{% url 'create_task' %}">Create</a>
+                        </li>
+                    {% endif %}
+                    {% if request.user|has_group:"Admin" %}
+                        <li class="user {% if section == 'administration' %}selected{% endif %}"><a class="nav-link"
+                                                                                                    href="{% url 'administration' %}">Administration</a>
+                        </li>
+                    {% endif %}
                     <li class="user"><a class="nav-link" href="">Search</a></li>
-                    <li class="user {% if section == 'profile' %}selected{% endif %}"><a class="nav-link" href="{% url 'edit' %}">Profile</a></li>
+                    <li class="user {% if section == 'profile' %}selected{% endif %}"><a class="nav-link"
+                                                                                         href="{% url 'profile' %}">Profile</a>
+                    </li>
                     <li class="user"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
                 </ul>
             </div>
@@ -21,10 +36,17 @@
             <div class="guest-content">
                 <p class="user-name">Hello guest!</p>
                 <ul>
-                    <li class="guest {% if section == 'index' %}selected{% endif %}"><a class="nav-link" href="{% url 'index' %}">Index</a></li>
-                    <li class="guest {% if section == 'login' %}selected{% endif %}"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                    <li class="guest {% if section == 'register' %}selected{% endif %}"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
-                    <li class="guest {% if section == 'about' %}selected{% endif %}"><a class="nav-link" href="">About</a></li>
+                    <li class="guest {% if section == 'index' %}selected{% endif %}"><a class="nav-link"
+                                                                                        href="{% url 'index' %}">Index</a>
+                    </li>
+                    <li class="guest {% if section == 'login' %}selected{% endif %}"><a class="nav-link"
+                                                                                        href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="guest {% if section == 'register' %}selected{% endif %}"><a class="nav-link"
+                                                                                           href="{% url 'register' %}">Register</a>
+                    </li>
+                    <li class="guest {% if section == 'about' %}selected{% endif %}"><a class="nav-link"
+                                                                                        href="">About</a></li>
                 </ul>
             </div>
         {% endif %}

@@ -1,8 +1,48 @@
 {% extends 'base.html' %}
-
-{% block title %}Dashboard{% endblock title %}
+{% load static %}
+{% load auth_filter %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">{% endblock css %}
+{% block title %}System Dashboard{% endblock title %}
 
 {% block content %}
-    <h1>Dashboard</h1>
-    <p>Welcome to your dashboard.</p>
+    <div class="content">
+        <h1>System Dashboard</h1>
+        <div class="info">
+            <div class="activity-stream">
+                <div class="activity-banner">
+                    <p>Activity Stream</p>
+                </div>
+            </div>
+            <div class="assigned">
+                <div class="assignment-banner">
+                    {% if request.user|has_group:"Manager" or request.user|has_group:"Admin" %}
+                        <p>My Projects</p>
+                    {% else %}
+                        <p>Assigned to Me</p>
+                    {% endif %}
+                </div>
+                <table class="project-table">
+                    <thead>
+                    <tr>
+                        <td>ID</td>
+                        <td>Name</td>
+                        <td>Assigned To</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            <td><a href="">{{ task.id }}</a></td>
+                            <td><a href="">{{ task.title|truncatechars:100 }}</a></td>
+                            <td>{% if task.assignee %}<a href="">{{ task.assignee|truncatechars:40 }}</a>{% else %}<p>None</p>{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 {% endblock content %}

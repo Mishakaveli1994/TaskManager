@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">{% endblock css %}
+{% block title %}Profile{% endblock title %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="picture">
+            {% if profile_photo %}
+                <a href="{{ profile_photo }}">
+                <img src="{{ profile_photo }}" width="200" height="200">
+            {% else %}
+                <a href="#"><img src="{% static 'img/no_photo.png' %}" width="200" height="200">
+            {% endif %}
+            </a>
+        </div>
+
+
+        <div class="info">
+            <p>Username: {{ user.username }}</p>
+            <p>First Name: {{ user.first_name }}</p>
+            <p>Last Name: {{ user.last_name }}</p>
+            <p>Date of Birth: {{ profile.date_of_birth|date:"M d, Y" }}</p>
+            <p>Position: {{ profile.position|title  }}</p>
+            <div class="profile-links">
+                <a href="{% url 'edit' %}">Edit Profile</a>
+                <a href="{% url 'password_change' %}">Reset Password</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

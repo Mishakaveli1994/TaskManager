@@ -12,9 +12,13 @@
         <form method="post" enctype="multipart/form-data">
             {{ user_form.as_p }}
             {{ profile_form.as_p }}
+            {% if profile_photo %}
+                <a href="{{ profile_photo }}">
+                    <img src="{{ profile_photo }}" width="200" height="200">
+                </a>
+            {% endif %}
             {% csrf_token %}
             <p><input type="submit" value="Save changes"></p>
         </form>
-    <p></p>
     </div>
 {% endblock content %}

@@ -72,3 +72,11 @@ input[type="submit"]:hover {
     padding: 10px 0 0 0;
     color: #ED4337;
 }
+
+#photo-clear{
+    display: block;
+}
+
+.form-field img{
+    margin-top:20px;
+}

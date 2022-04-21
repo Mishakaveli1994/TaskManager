@@ -11,6 +11,45 @@
     text-shadow: 2px 2px 2px #CE5937;
 }
 
-.selected a:hover{
+.selected a:hover {
     text-shadow: none;
+}
+
+.messages {
+    list-style: none;
+}
+
+.success,
+.error {
+    text-align: center;
+    padding: 10px 0;
+    width: 45%;
+    position: fixed;
+    left: 50%;
+    top: 77px;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-around;
+        text-shadow: -1px -1px 1px rgba(255,255,255,.1), 1px 1px 1px rgba(0,0,0,.5);
+}
+
+.success a,
+.error a {
+    text-decoration: none;
+    font-size:14px;
+    color:black;
+    padding:2px 15px;
+    background:white;
+    border-radius:3px;
+}
+
+.success {
+    background: #81ce81;
+}
+
+.error {
+    background: #ED4337;
 }
