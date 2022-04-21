@@ -8,26 +8,12 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="{% static 'css/nav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block css %}{% endblock css %}
     <title>{% block title %}{% endblock title %}</title>
 </head>
 <body>
-<nav>
-    <ul>
-        <li class="nav-icon"><a class="nav-icon" href=""><img src="{% static 'img/manage-1193.svg' %}" alt=""></a></li>
-        {% if user.is_authenticated %}
-            <li class="user"><a class="nav-link" href="">Dashboard</a></li>
-            <li class="user"><a class="nav-link" href="">Projects</a></li>
-            <li class="user"><a class="nav-link" href="">Profile</a></li>
-            <li class="user"><a class="nav-link" href="">Create</a></li>
-            <li class="user"><a class="nav-link" href="">Search</a></li>
-            <li class="user"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
-        {% else %}
-            <li class="guest"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-            <li class="guest"><a class="nav-link" href="">Register</a></li>
-        {% endif %}
-    </ul>
-</nav>
+{% include 'nav.html' %}
 {% block content %}
 {% endblock content %}
 </body>

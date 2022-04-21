@@ -8,28 +8,36 @@ body {
     margin: 0 50px;
 }
 
+#nav-bar {
+    display: flex;
+    background: #18596D;
+    align-items: center;
+    justify-content: space-between;
+}
+
 nav ul {
     list-style: none;
     display: flex;
-    align-items: center;
-    background: #18596D;
+    flex-basis: 90%;
 }
 
 nav li.user {
     flex-grow: 1;
     text-align: center;
+    padding: 0 10px;
 }
 
-nav li.nav-icon{
-    margin:0 30px;
+nav li.guest {
+    padding: 0 10px;
+}
+
+nav .nav-icon {
+    margin: 0 30px;
     flex-grow: 0;
 }
 
 nav img {
     height: 40px;
-}
-
-.guest{
 }
 
 .nav-link {
@@ -44,4 +52,28 @@ nav img {
     color: #FC6620;
     background: white;
     transition: 0.3s;
+}
+
+.guest-content {
+    display: flex;
+    align-items: center;
+    flex-basis: 100%;
+}
+
+.guest-content ul {
+    justify-content: flex-end;
+}
+
+.user-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-basis: 100%;
+}
+
+.user-name {
+    color: white;
+    font-weight: bold;
+    letter-spacing: 1px;
+    white-space: nowrap;
 }

@@ -1,0 +1,32 @@
+{% load static %}
+
+<nav>
+    <div id="nav-bar">
+        <div class="icon">
+            <a class="nav-icon" href=""><img src="{% static 'img/manage-1193.svg' %}" alt=""></a>
+        </div>
+        {% if user.is_authenticated %}
+            <div class="user-content">
+                <p class="user-name">Hello {{ user.first_name }}!</p>
+                <ul>
+                    <li class="user {% if section == 'dashboard' %}selected{% endif %}"><a class="nav-link" href="">Dashboard</a></li>
+                    <li class="user {% if section == 'projects' %}selected{% endif %}"><a class="nav-link" href="">Projects</a></li>
+                    <li class="user {% if section == 'create' %}selected{% endif %}"><a class="nav-link" href="">Create</a></li>
+                    <li class="user"><a class="nav-link" href="">Search</a></li>
+                    <li class="user {% if section == 'profile' %}selected{% endif %}"><a class="nav-link" href="{% url 'edit' %}">Profile</a></li>
+                    <li class="user"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            </div>
+        {% else %}
+            <div class="guest-content">
+                <p class="user-name">Hello guest!</p>
+                <ul>
+                    <li class="guest {% if section == 'index' %}selected{% endif %}"><a class="nav-link" href="{% url 'index' %}">Index</a></li>
+                    <li class="guest {% if section == 'login' %}selected{% endif %}"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="guest {% if section == 'register' %}selected{% endif %}"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                    <li class="guest {% if section == 'about' %}selected{% endif %}"><a class="nav-link" href="">About</a></li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</nav>

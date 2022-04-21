@@ -1,0 +1,16 @@
+.centered {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, 0);
+}
+
+.selected a {
+    color: #FFFFFF;
+    text-shadow: 2px 2px 2px #CE5937;
+}
+
+.selected a:hover{
+    text-shadow: none;
+}
