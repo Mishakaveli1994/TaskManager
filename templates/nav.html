@@ -27,7 +27,7 @@
                     {% endif %}
                     <li class="user"><a class="nav-link" href="">Search</a></li>
                     <li class="user {% if section == 'profile' %}selected{% endif %}"><a class="nav-link"
-                                                                                         href="{% url 'profile' %}">Profile</a>
+                                                                                         href="{% url 'profile' user.username %}">Profile</a>
                     </li>
                     <li class="user"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
                 </ul>

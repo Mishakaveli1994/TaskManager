@@ -1,0 +1,31 @@
+.task-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-container textarea {
+    resize: none;
+}
+
+.task-container button {
+    align-self: center;
+}
+
+.task-container h1 {
+    text-align: center;
+}
+
+.task-sub {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.task-info {
+
+}
+
+.sub-info {
+
+}

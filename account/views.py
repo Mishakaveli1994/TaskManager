@@ -5,7 +5,8 @@ from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditFor
 from .models import Profile
 from django.contrib import messages
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
+
 
 # Create your views here.
 
@@ -93,14 +94,17 @@ def edit(request):
 
 
 @login_required
-def profile(request):
-    user = request.user
-    user_profile = user.profile
+def profile(request, slug):
+    if slug:
+        current_user = User.objects.get(username=slug)
+    else:
+        current_user = request.user
+    user_profile = current_user.profile
     profile_photo = ''
     if user_profile.photo:
         profile_photo = str(settings.MEDIA_URL) + str(user_profile.photo)
     if request.method == 'GET':
         return render(request, 'registration/profile.html',
-                      {'user': user,
+                      {'current_user': current_user,
                        'profile': user_profile,
                        'profile_photo': profile_photo})

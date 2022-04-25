@@ -1,14 +1,19 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from .forms import TaskCreationForm
+from django.views.generic import DetailView
+
+from .forms import TaskCreationForm, TaskEditForm
 from django.contrib import messages
 from group_validation import group_required
 from .models import Task
+from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage
 
 
 # Create your views here.
 @login_required
 def dashboard(request):
+    tasks_paginate_by = 10
     user = request.user
     tasks = ''
     if user.groups.filter(name='Admin').exists():
@@ -17,10 +22,44 @@ def dashboard(request):
         tasks = Task.objects.all().filter(author=user.id).order_by('-updated')
     elif user.groups.filter(name='Employee').exists():
         tasks = Task.objects.all().filter(assignee=user.id).order_by('-updated')
-    return render(request,
-                  'dashboard.html',
-                  {'section': 'dashboard',
-                   'tasks': tasks})
+    paginator = Paginator(tasks, tasks_paginate_by)
+    tasks = paginator.get_page(1)
+    if request.method == 'GET':
+        return render(request,
+                      'dashboard.html',
+                      {'section': 'dashboard',
+                       'tasks': tasks})
+
+
+def tasks_listing(request):
+    page_number = request.GET.get("page", 1)
+    per_page = request.GET.get("per_page", 11)
+    user = request.user
+    tasks = ''
+    if user.groups.filter(name='Admin').exists():
+        tasks = Task.objects.all().order_by('-updated')
+    elif user.groups.filter(name='Manager').exists():
+        tasks = Task.objects.all().filter(author=user.id).order_by('-updated')
+    elif user.groups.filter(name='Employee').exists():
+        tasks = Task.objects.all().filter(assignee=user.id).order_by('-updated')
+    paginator = Paginator(tasks, per_page)
+    page_obj = paginator.get_page(page_number)
+    data = [{'id': kw.id,
+             'title': kw.title,
+             'assignee': str(kw.assignee),
+             'priority': kw.priority,
+             'status': kw.status} for kw in
+            page_obj.object_list]
+
+    payload = {
+        "page": {
+            "current": page_obj.number,
+            "has_next": page_obj.has_next(),
+            "has_previous": page_obj.has_previous(),
+        },
+        "data": data
+    }
+    return JsonResponse(payload)
 
 
 @group_required('Manager', 'Admin')
@@ -63,3 +102,14 @@ def index(request):
     return render(request,
                   'index.html',
                   {'section': 'index'})
+
+
+@login_required
+def task_details(request, task_id):
+    task = Task.objects.get(id=task_id)
+    if request.method == 'POST':
+        pass
+    else:
+        task_form = TaskEditForm(instance=task)
+        return render(request, 'task_details.html',
+                      {'form': task_form})

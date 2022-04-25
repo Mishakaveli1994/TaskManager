@@ -27,22 +27,109 @@
                     <tr>
                         <td>ID</td>
                         <td>Name</td>
+                        <td>Status</td>
+                        <td>Priority</td>
                         <td>Assigned To</td>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for task in tasks %}
-                        <tr>
-                            <td><a href="">{{ task.id }}</a></td>
-                            <td><a href="">{{ task.title|truncatechars:100 }}</a></td>
-                            <td>{% if task.assignee %}<a href="">{{ task.assignee|truncatechars:40 }}</a>{% else %}<p>None</p>{% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
                     </tbody>
                 </table>
+                <div class="paginator">
+                    <p class="current-hold">
+                        Current Page: <b id="current"></b>
+                    </p>
+
+                    <div>
+                        <a href="#" id="prev">
+                            Previous Page
+                        </a>
+                        <a href="#" id="next">
+                            Next Page
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
 {% endblock content %}
+
+{% block script %}
+    <script>
+        async function getData(url, page, paginateBy) {
+            const urlWithParams = url + "?" + new URLSearchParams({
+                page: page,
+                per_page: paginateBy
+            })
+            const response = await fetch(urlWithParams);
+            return response.json();
+        }
+
+        class FauxPaginator {
+            constructor(perPage) {
+                this.perPage = perPage
+                this.pageIndex = 1
+                this.container = document.querySelector("tbody")
+                this.label = document.querySelector("#current")
+                this.prev = document.querySelector("#prev")
+                this.next = document.querySelector("#next")
+                this.prev.addEventListener("click", this.onPrevClick.bind(this))
+                this.next.addEventListener("click", this.onNextClick.bind(this))
+                this.goToPage()
+            }
+
+            onPrevClick(event) {
+                event.preventDefault()
+                this.pageIndex--
+                this.goToPage()
+            }
+
+            onNextClick(event) {
+                event.preventDefault()
+                this.pageIndex++
+                this.goToPage()
+            }
+
+            addElement(task) {
+                let titleLen = 30
+                let assigneeLen = 10
+
+                if (task.title.length > titleLen){
+                    task.title = `${task.title.substring(0, titleLen)}...`
+                }
+
+                let tr = `<tr>
+                            <td><a href="/tasks/${task.id}">${task.id}</a></td>
+                            <td><a href="/tasks/${task.id}">${task.title}</a></td>
+                            <td><p>${task.status}</p></td>
+                            <td><p>${task.priority}</p></td>
+                            <td>${(task.assignee != 'None') ? `<a href="/account/profile/${task.assignee}">${task.assignee.substring(0, assigneeLen)}</a>` : '<p>None</p>'}
+                            </td>
+                         </tr>`
+
+                this.container.innerHTML += tr
+
+
+            }
+
+            goToPage() {
+                getData("{% url 'tasks-api' %}", this.pageIndex, this.perPage)
+                    .then(response => {
+                        this.container.innerHTML = '';
+                        response.data.forEach((el) => {
+                            console.log(el)
+                            this.addElement(el)
+                        });
+                        this.label.innerText = this.pageIndex
+                        const firstPage = this.pageIndex === 1
+                        const lastPage = !response.page.has_next
+                        this.prev.style.display = firstPage ? "none" : "inline-block"
+                        this.next.style.display = lastPage ? "none" : "inline-block"
+                    });
+            }
+        }
+
+        new FauxPaginator(11);
+    </script>
+{% endblock script %}

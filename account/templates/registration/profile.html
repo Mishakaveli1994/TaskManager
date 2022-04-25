@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load auth_filter %}
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">{% endblock css %}
@@ -20,15 +21,17 @@
 
 
         <div class="info">
-            <p>Username: {{ user.username }}</p>
-            <p>First Name: {{ user.first_name }}</p>
-            <p>Last Name: {{ user.last_name }}</p>
+            <p>Username: {{ current_user.username }}</p>
+            <p>First Name: {{ current_user.first_name }}</p>
+            <p>Last Name: {{ current_user.last_name }}</p>
             <p>Date of Birth: {{ profile.date_of_birth|date:"M d, Y" }}</p>
             <p>Position: {{ profile.position|title  }}</p>
+            {% if user.username == current_user.username or user|has_group:"Admin"%}
             <div class="profile-links">
                 <a href="{% url 'edit' %}">Edit Profile</a>
                 <a href="{% url 'password_change' %}">Reset Password</a>
             </div>
+            {% endif %}
         </div>
     </div>
 

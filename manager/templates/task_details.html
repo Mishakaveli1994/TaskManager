@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/task-details.css' %}">
+{% endblock css %}
+
+{% block title %}Task Details{% endblock title %}
+
+{% block content %}
+    <div class="task-container">
+        <h1>{{ form.title.value }}</h1>
+        <form method="post">
+            <div class="task-sub">
+                <div class="task-info">
+                    <textarea rows="30" cols="80">{{ form.description.value }}</textarea>
+                    <p>Author: {{ form.author }}</p>
+                </div>
+                <div class="sub-info">
+                </div>
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
