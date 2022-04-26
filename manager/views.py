@@ -107,6 +107,15 @@ def index(request):
 @login_required
 def task_details(request, task_id):
     task = Task.objects.get(id=task_id)
+    subtasks = Task.objects.all().filter(parent_task=task)
+    return render(request, 'task_details.html',
+                  {'task': task,
+                   'subtasks':subtasks})
+
+
+@login_required
+def edit_task_details(request, task_id):
+    task = Task.objects.get(id=task_id)
     if request.method == 'POST':
         pass
     else:

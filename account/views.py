@@ -64,26 +64,27 @@ def register(request):
 
 
 @login_required
-def edit(request):
+def edit(request, slug):
+    current_user = User.objects.get(username=slug)
     profile_photo = ''
-    if request.user.profile.photo:
-        profile_photo = str(settings.MEDIA_URL) + str(request.user.profile.photo)
+    if current_user.profile.photo:
+        profile_photo = str(settings.MEDIA_URL) + str(current_user.profile.photo)
     if request.method == 'POST':
-        user_form = UserEditForm(instance=request.user,
+        user_form = UserEditForm(instance=current_user,
                                  data=request.POST)
-        profile_form = ProfileEditForm(instance=request.user.profile,
+        profile_form = ProfileEditForm(instance=current_user.profile,
                                        data=request.POST,
                                        files=request.FILES)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
             messages.success(request, 'Profile updated successfully.')
-            return redirect('edit')
+            return redirect('edit', slug)
         else:
             messages.error(request, 'Error while updating your profile.')
     else:
-        user_form = UserEditForm(instance=request.user)
-        profile_form = ProfileEditForm(instance=request.user.profile)
+        user_form = UserEditForm(instance=current_user)
+        profile_form = ProfileEditForm(instance=current_user.profile)
 
     return render(request,
                   'registration/edit.html',

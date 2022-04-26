@@ -28,7 +28,7 @@
             <p>Position: {{ profile.position|title  }}</p>
             {% if user.username == current_user.username or user|has_group:"Admin"%}
             <div class="profile-links">
-                <a href="{% url 'edit' %}">Edit Profile</a>
+                <a href="{% url 'edit' current_user %}">Edit Profile</a>
                 <a href="{% url 'password_change' %}">Reset Password</a>
             </div>
             {% endif %}

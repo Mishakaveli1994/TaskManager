@@ -1,31 +1,171 @@
+.container {
+    background: #F7F8F9;
+    height: 80vh;
+}
+
 .task-container {
-    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.container h1 {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.people img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+.header-p {
+    font-weight: bold;
+    padding: 10px 10px 5px 0;
+}
+
+div.assignee,
+div.author {
+    display: flex;
+    align-items: center;
+}
+
+a.assignee,
+a.author {
+    display: flex;
+    align-items: center;
+}
+
+p.assignee {
+    padding-right: 60px;
+}
+
+
+p.author {
+    padding-right: 63px;
+}
+
+.assignee-img,
+.author-img {
+    display: flex;
+    align-items: center;
+}
+
+.assignee-img p {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+div.assignee {
+    margin-bottom: 10px;
+}
+
+.assignee-img a,
+.author-img a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #1F596C;
+    padding-left: 10px;
+}
+
+.assignee-img a:hover,
+.author-img a:hover {
+    color: #FC6620;
+}
+
+.task-details,
+.dates,
+.time-tracking {
+    display: flex;
+}
+
+.task-details {
+    margin-bottom: 30px;
+}
+
+.task-details-left {
+    padding-right: 40px;
+}
+
+.task-details-left p {
+    padding-bottom: 10px;
+}
+
+.dates-left {
+    padding-right: 35px;
+}
+
+.dates-left p {
+    padding-bottom: 10px;
+}
+
+.time-tracking-left {
+    padding-right: 50px;
+}
+
+.time-tracking-left p {
+    padding-bottom: 10px;
+}
+
+.task-details-cont {
     display: flex;
     flex-direction: column;
 }
 
-.task-container textarea {
-    resize: none;
+.task-details-right,
+.dates-right,
+.time-tracking-right {
 }
 
-.task-container button {
-    align-self: center;
-}
-
-.task-container h1 {
-    text-align: center;
-}
-
-.task-sub {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
+.task-details-right p,
+.dates-right p,
+.time-tracking-right p {
+    padding-bottom: 10px;
 }
 
 .task-info {
-
+    margin-top: 70px;
+    width: 50vw;
 }
 
-.sub-info {
-
+.task-top-cont textarea {
+    resize: none;
+    padding: 10px;
+    border-radius: 5px;
 }
+
+.subtasks {
+    border: 2px solid;
+    height: 250px;
+    border-radius: 5px;
+    overflow-y: auto;
+    width: 100%;
+    text-align: center;
+}
+
+.subtasks-header {
+    display: flex;
+    padding: 5px 0;
+    font-weight: bold;
+}
+
+.subtasks-header p,
+.subtask p {
+    flex-basis: 33%;
+}
+
+.subtask {
+    display: flex;
+    align-items: center;
+}
+
+.subtasks a {
+    padding: 5px 0 0 0;
+    text-decoration: none;
+    flex-basis: 33%;
+}
+
+.subtasks div:nth-child(even) {
+    background-color: #f2f2f2;
+}
+

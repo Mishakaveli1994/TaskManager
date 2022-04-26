@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load auth_filter %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/task-details.css' %}">
 {% endblock css %}
@@ -8,18 +8,116 @@
 {% block title %}Task Details{% endblock title %}
 
 {% block content %}
-    <div class="task-container">
-        <h1>{{ form.title.value }}</h1>
-        <form method="post">
-            <div class="task-sub">
-                <div class="task-info">
-                    <textarea rows="30" cols="80">{{ form.description.value }}</textarea>
-                    <p>Author: {{ form.author }}</p>
+    <div class="container">
+        <h1>{{ task.title }}</h1>
+        <div class="task-container">
+            <div class="task-top-cont">
+                <div class="task-details">
+                    <div class="task-details-left">
+                        <p class="priority {{ task.priority }}">Priority:</p>
+                        <p class="status {{ task.status }}">Status:</p>
+                        <p class="resolution {{ task.resolved }}">Resolution:</p>
+                        <p class="parent-task">Parent Task</p>
+                    </div>
+                    <div class="task-details-right">
+                        <p class="priority">{{ task.priority|title }}
+                        <p class="status">{{ task.status|title }}</p>
+                        <p class="resolution">{{ task.resolved|title }}</p>
+                        {% if task.parent_task %}
+                            <a href="{{ task.parent_task.id }}">{{ task.parent_task }}</a>
+                        {% else %}
+                            <p>None</p>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="sub-info">
-                </div>
-                <button type="submit">Save Changes</button>
+                <textarea rows="20" cols="60">{{ task.description }}</textarea>
             </div>
-        </form>
+            <div class="task-info">
+                <p class="header-p">People</p>
+                <div class="people">
+                    <div class="assignee">
+                        <p class="assignee">Assignee:</p>
+                        <div class="assignee-img">
+                            {% if task.assignee.profile.photo.url %}
+                                <img src="{{ task.assignee.profile.photo.url }}" alt="">
+                            {% else %}
+                                <img src="{% static 'img/no_photo.png' %}" alt="">
+                            {% endif %}
+                            {% if task.assignee %}
+                                <a class="assignee" href="/account/profile/{{ task.assignee }}">{{ task.assignee }}</a>
+                            {% else %}
+                                <p>None</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="author">
+                        <p class="author">Reporter:</p>
+                        <div class="author-img">
+                            {% if task.author.profile.photo.url %}
+                                <img src="{{ task.author.profile.photo.url }}" alt="">
+                            {% else %}
+                                <img src="{% static 'img/no_photo.png' %}" alt="">
+                            {% endif %}
+                            <a class="author" href="/account/profile/{{ task.author }}">{{ task.author }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dates-container">
+                    <p class="header-p">Dates</p>
+                    <div class="dates">
+                        <div class="dates-left">
+                            <p class="created">Created:</p>
+                            <p class="updated">Last updated:</p>
+                        </div>
+                        <div class="dates-right">
+                            <p>{{ task.publish|date:"D d M Y H:i" }}</p>
+                            <p>{{ task.updated|timesince }} ago</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="time-tracking-container">
+                    <p class="header-p">Time Tracking</p>
+                    <div class="time-tracking">
+                        <div class="time-tracking-left">
+                            <p class="estimated">Estimated:</p>
+                            <p class="remaining">Remaining:</p>
+                            <p class="logged">Logged:</p>
+                        </div>
+                        <div class="time-tracking-right">
+                            <p class="estimated">{{ task.estimate }}H</p>
+                            {% with task.estimate|sub:task.tracked_time as remaining %}
+                                {% if remaining < 0 %}
+                                    <p class="remaining">0H</p>
+                                {% else %}
+                                    <p class="remaining">{{ remaining }}H
+                                {% endif %}
+                            {% endwith %}
+                            <p class="logged">{{ task.tracked_time }}H</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="subtasks-container">
+                    <p class="header-p">Subtasks</p>
+                    <div class="subtasks">
+                        <div class="subtasks-header">
+                            <p>Task</p>
+                            <p>Status</p>
+                            <p>Priority</p>
+                        </div>
+                        {% for task in subtasks %}
+                            <div class="subtask">
+                                <a href="/tasks/{{ task.id }}">{{ task|truncatechars:30 }}</a>
+                                <p class="{{ task.status }}">{{ task.status|title }}</p>
+                                <p class="{{ task.priority }}">{{ task.priority|title }}</p>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock content %}

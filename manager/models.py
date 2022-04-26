@@ -17,6 +17,12 @@ class Task(models.Model):
         ('medium', 'Medium'),
         ('high', 'High')
     )
+
+    RESOLUTION_CHOICES = (
+        ('unresolved', 'Unresolved'),
+        ('resolved', 'Resolved'),
+    )
+
     title = models.CharField(max_length=200)
     description = models.TextField()
     slug = models.SlugField(max_length=200, unique_for_date='publish')
@@ -27,6 +33,7 @@ class Task(models.Model):
 
     assignee = models.ForeignKey(User,
                                  null=True,
+                                 blank=True,
                                  on_delete=models.SET_NULL,
                                  related_name='taken_tasks')
 
@@ -47,7 +54,11 @@ class Task(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    tracked_time = models.IntegerField(null=True)
+    tracked_time = models.IntegerField(null=True, blank=True, default=0)
+
+    resolved = models.CharField(max_length=10,
+                                choices=RESOLUTION_CHOICES,
+                                default='unresolved')
 
     def save(self, *args, **kwargs):
         if not self.slug:
