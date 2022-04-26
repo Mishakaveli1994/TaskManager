@@ -81,15 +81,10 @@ div.assignee {
 
 .task-details {
     margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
 }
 
-.task-details-left {
-    padding-right: 40px;
-}
-
-.task-details-left p {
-    padding-bottom: 10px;
-}
 
 .dates-left {
     padding-right: 35px;
@@ -159,7 +154,8 @@ div.assignee {
     align-items: center;
 }
 
-.subtasks a {
+.subtasks a,
+.task-details-right a {
     padding: 5px 0 0 0;
     text-decoration: none;
     flex-basis: 33%;
@@ -169,3 +165,100 @@ div.assignee {
     background-color: #f2f2f2;
 }
 
+#priority,
+#status,
+#resolution,
+#parent-task {
+    display: flex;
+    align-items: baseline;
+    padding: 5px;
+}
+
+#priority:hover a,
+#status:hover a,
+#resolution:hover a {
+    opacity: 1;
+    transition: 0.3s;
+}
+
+#priority a,
+#status a,
+#resolution a {
+    margin-left: 10px;
+    opacity: 0;
+    color: #1F596C;
+}
+
+#priority a:hover,
+#status a:hover,
+#resolution a:hover {
+    color: #FC6620;
+}
+
+.priority:first-child,
+.status:first-child,
+.resolution:first-child,
+.parent-task:first-child {
+    width: 100px;
+}
+
+#parent-task a {
+    text-decoration: none;
+    color: #1F596C;
+    font-weight: bold;
+}
+
+#parent-task a:hover {
+    color: #FC6620;
+    transition: 0.3s;
+}
+
+#priority .inner-field,
+#status .inner-field,
+#resolution .inner-field {
+    display: flex;
+    padding: 5px;
+    border: 1px solid #F7F8F9;
+}
+
+#parent-task .inner-field {
+    padding-left: 5px;
+}
+
+#priority .inner-field:hover,
+#status .inner-field:hover,
+#resolution .inner-field:hover {
+    border-radius: 5px;
+    border-color: gray;
+    transition: 0.3s;
+}
+
+#priority-dropdown {
+
+}
+
+div.dropdown {
+    flex-direction: column;
+    display: none;
+    position: absolute;
+    left:325px;
+}
+
+div.dropdown a {
+    text-decoration: none;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #1F596C;
+}
+
+div.dropdown a:hover {
+    color: #FC6620;
+    background: #1F596C;
+    transition: 0.3s;
+}
+
+.show {
+    display: flex !important;
+}
