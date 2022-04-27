@@ -2,14 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.views.generic import DetailView
 import json
 
-from .forms import TaskCreationForm, TaskEditForm
+from .forms import TaskCreationForm
 from django.contrib import messages
 from group_validation import group_required
 from .models import Task
-from django.core.paginator import Paginator, PageNotAnInteger, InvalidPage
+from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -115,17 +114,15 @@ def task_details(request, task_id):
                       {'task': task,
                        'subtasks': subtasks})
 
-{'priority': 'Low', 'status': 'Opened', 'resolution': 'Unresolved', 'assignee': 'Kalata', 'logged': 'Logged', 'title': 'Task 1', 'description': 'Hehehe'}
-
-
 @login_required
 def update_task(request, task_id):
     task = Task.objects.get(id=task_id)
     if request.method == 'POST':
         task_values = json.loads(request.body)
+        print(task_values)
         task.priority = task_values['priority']
         task.status = task_values['status']
-        task.resolution = task_values['resolution']
+        task.resolved = task_values['resolution']
         assignee = User.objects.get(username=task_values['assignee'])
         task.assignee = assignee
         task.logged = task_values['logged']

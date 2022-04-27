@@ -30,7 +30,7 @@
                     <div id="status">
                         <p class="status">Status:</p>
                         <div class="inner-field">
-                            <p class="status  {{ task.status.split|lower|join:"-" }}">{{ task.status|title }}</p>
+                            <p class="status  {{ task.status|lower }}">{{ task.status|title }}</p>
                             {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
                                 <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
                             {% endif %}
@@ -84,6 +84,7 @@
                             {% else %}
                                 <p>None</p>
                             {% endif %}
+                            <button id="assign-me">Assign to me</button>
                         </div>
                     </div>
                     <div class="author">
@@ -133,25 +134,31 @@
                             <p class="logged">{{ task.tracked_time }}H</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="subtasks-container">
-                    <p class="header-p">Subtasks</p>
-                    <div class="subtasks">
-                        <div class="subtasks-header">
-                            <p>Task</p>
-                            <p>Status</p>
-                            <p>Priority</p>
-                        </div>
-                        {% for task in subtasks %}
-                            <div class="subtask">
-                                <a href="/tasks/{{ task.id }}">{{ task|truncatechars:30 }}</a>
-                                <p class="{{ task.status|join:"-" }}">{{ task.status|title }}</p>
-                                <p class="{{ task.priority }}">{{ task.priority|title }}</p>
-                            </div>
-                        {% endfor %}
+                    <div id="tracked-time">
+                        <ul>
+                            <li>Kek</li>
+                        </ul>
                     </div>
                 </div>
+
+
+            </div>
+        </div>
+        <div class="subtasks-container">
+            <p class="header-p">Subtasks</p>
+            <div class="subtasks">
+                <div class="subtasks-header">
+                    <p>Task</p>
+                    <p>Status</p>
+                    <p>Priority</p>
+                </div>
+                {% for task in subtasks %}
+                    <div class="subtask">
+                        <a href="/tasks/{{ task.id }}">{{ task|truncatechars:30 }}</a>
+                        <p class="{{ task.status|join:"-" }}">{{ task.status|title }}</p>
+                        <p class="{{ task.priority }}">{{ task.priority|title }}</p>
+                    </div>
+                {% endfor %}
             </div>
         </div>
         {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
@@ -169,8 +176,18 @@
             let editMenu = document.querySelectorAll(".inner-field a");
             let dropdownMenus = document.querySelectorAll("div.dropdown");
             let updateBtn = document.getElementById("update-task");
+            let assignBtn = document.getElementById("assign-me");
 
             updateBtn.addEventListener('click', updateTask)
+            assignBtn.addEventListener('click', updateAssignee)
+
+            function updateAssignee(ev) {
+                let assigneeElementImg = document.querySelector(".assignee-img img")
+                let assigneeElementA = document.querySelector(".assignee-img a")
+                assigneeElementA.href = '/account/profile/' + "{{ user.username }}"
+                assigneeElementA.innerText = "{{ user.username }}"
+                assigneeElementImg.src = "{{ user.profile.photo.url }}"
+            }
 
             async function updateTask(ev) {
                 let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
@@ -194,7 +211,8 @@
                         body: JSON.stringify(data)
                     }
                 )
-                console.log(await request.json())
+                console.log(await request.json());
+                [...document.querySelectorAll('.bold')].map(x => x.classList.remove('bold'))
             }
 
             const innerPriority = document.querySelector('.inner-field .priority').innerText
@@ -232,20 +250,23 @@
                 let elementId = ev.target.parentNode.id
                 let element = menuMap[elementId]
                 let value = element.innerText.toLowerCase()
+                let newValue = ev.target.innerText.toLowerCase()
                 closeOptions(element)
                 element.innerText = ev.target.innerText
-                element.classList.remove(value)
-                if (ev.target.innerText.toLowerCase() === 'in progress') {
-                    element.classList.remove(value)
-                    element.classList.add('in-progress')
-                } else {
-                    element.classList.remove('in-progress')
-                    element.classList.add(ev.target.innerText.toLowerCase())
+                if (value === 'in progress') {
+                    value = 'in-progress'
                 }
+                if (newValue === 'in progress') {
+                    newValue = 'in-progress'
+                }
+                console.log(value, newValue)
+                element.classList.remove(value)
+                element.classList.add(newValue)
+
                 if (element.innerText.toLowerCase() !== initialValues[elementId].toLowerCase()) {
-                    element.style.fontWeight = 'bold';
+                    element.classList.add('bold');
                 } else {
-                    element.style.fontWeight = 'normal';
+                    element.classList.remove('bold');
                 }
             }
         }

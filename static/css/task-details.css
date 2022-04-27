@@ -1,6 +1,6 @@
 .container {
     background: #F7F8F9;
-    height: 90vh;
+    height: 102vh;
 }
 
 .task-container {
@@ -49,6 +49,7 @@ p.author {
 .author-img {
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .assignee-img p {
@@ -270,17 +271,45 @@ div.dropdown a:hover {
 
 #update-task {
     margin-top: 40px;
-    padding:10px 20px;
+    padding: 10px 20px;
     border-radius: 5px;
     border: 1px solid;
     background: #18596D;
     font-weight: bold;
-    color:white;
+    color: white;
 }
 
-#update-task:hover{
-    color:#FC6620;
+#update-task:hover {
+    color: #FC6620;
     transition: 0.3s;
-    cursor:pointer;
+    cursor: pointer;
+    background: white;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+#assign-me {
+    margin: auto;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid;
+    background: #18596D;
+    font-weight: bold;
+    color: white;
+}
+
+#assign-me:hover {
+    color: #FC6620;
+    transition: 0.3s;
+    cursor: pointer;
+    background: white;
+}
+
+#tracked-time{
+    width: 90%;
+    height: 120px;
+    margin:10px 20px;
     background:white;
 }

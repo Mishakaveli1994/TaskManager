@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -45,7 +46,7 @@ class Task(models.Model):
                                 choices=PRIORITY_CHOICES,
                                 default='low')
 
-    estimate = models.FloatField(default=0)
+    estimate = models.PositiveIntegerField(default=0, validators=[MinValueValidator(1)])
 
     parent_task = models.ForeignKey('self', null=True, blank=True,
                                     default=None, on_delete=models.CASCADE)
@@ -70,3 +71,21 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class TimeEntry(models.Model):
+    parent_task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    time = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    assignee = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.assignee.username} tracked {self.time}H on task {self.parent_task}"
+
+
+class Activity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    activityMessage = models.CharField(max_length=200)
+    project = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, default=None)
+
+    def __str__(self):
+        return f"{self.user.username} has {self.activityMessage}"
