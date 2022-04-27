@@ -3,6 +3,13 @@ form label {
     display: block;
 }
 
+form.edit-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
 form input[type="text"],
 form input[type="password"],
 form input[type="email"] {
@@ -73,10 +80,10 @@ input[type="submit"]:hover {
     color: #ED4337;
 }
 
-#photo-clear{
+#photo-clear {
     display: block;
 }
 
-.form-field img{
-    margin-top:20px;
+.form-field img {
+    margin-top: 20px;
 }

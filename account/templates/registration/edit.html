@@ -9,7 +9,7 @@
     <div class="form-field centered">
         <h1>Edit your account</h1>
         <p>You can edit your account using the following form:</p>
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" class="edit-profile" enctype="multipart/form-data">
             {{ user_form.as_p }}
             {{ profile_form.as_p }}
             {% if profile_photo %}
