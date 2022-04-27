@@ -68,7 +68,7 @@ def edit(request, slug):
     current_user = User.objects.get(username=slug)
     profile_photo = ''
     if current_user.profile.photo:
-        profile_photo = str(settings.MEDIA_URL) + str(current_user.profile.photo)
+        profile_photo = current_user.profile.photo.url
     if request.method == 'POST':
         user_form = UserEditForm(instance=current_user,
                                  data=request.POST)
@@ -103,7 +103,7 @@ def profile(request, slug):
     user_profile = current_user.profile
     profile_photo = ''
     if user_profile.photo:
-        profile_photo = str(settings.MEDIA_URL) + str(user_profile.photo)
+        profile_photo = current_user.profile.photo.url
     if request.method == 'GET':
         return render(request, 'registration/profile.html',
                       {'current_user': current_user,
