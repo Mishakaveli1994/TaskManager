@@ -14,10 +14,12 @@
             <div class="task-top-cont">
                 <div class="task-details">
                     <div id="priority">
-                        <p class="priority {{ task.priority }}">Priority:</p>
+                        <p class="priority">Priority:</p>
                         <div class="inner-field">
-                            <p class="priority">{{ task.priority|title }}</p>
-                            <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                            <p class="priority {{ task.priority }}">{{ task.priority|title }}</p>
+                            {% if request.user == task.author or request.user|has_group:"Admin" %}
+                                <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                     <div id="priority-dropdown" class="dropdown">
@@ -26,10 +28,12 @@
                         <a href="#">High</a>
                     </div>
                     <div id="status">
-                        <p class="status {{ task.status }}">Status:</p>
+                        <p class="status">Status:</p>
                         <div class="inner-field">
-                            <p class="status">{{ task.status|title }}</p>
-                            <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                            <p class="status  {{ task.status.split|lower|join:"-" }}">{{ task.status|title }}</p>
+                            {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
+                                <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                     <div id="status-dropdown" class="dropdown">
@@ -39,10 +43,12 @@
                         <a href="#">Completed</a>
                     </div>
                     <div id="resolution">
-                        <p class="resolution {{ task.resolved }}">Resolution:</p>
+                        <p class="resolution">Resolution:</p>
                         <div class="inner-field">
-                            <p class="resolution">{{ task.resolved|title }}</p>
-                            <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                            <p class="resolution {{ task.resolved }}">{{ task.resolved|title }}</p>
+                            {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
+                                <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                            {% endif %}
                         </div>
                     </div>
                     <div id="resolution-dropdown" class="dropdown">
@@ -68,7 +74,7 @@
                     <div class="assignee">
                         <p class="assignee">Assignee:</p>
                         <div class="assignee-img">
-                            {% if task.assignee.profile.photo.url %}
+                            {% if task.assignee.profile.photo %}
                                 <img src="{{ task.assignee.profile.photo.url }}" alt="">
                             {% else %}
                                 <img src="{% static 'img/no_photo.png' %}" alt="">
@@ -140,7 +146,7 @@
                         {% for task in subtasks %}
                             <div class="subtask">
                                 <a href="/tasks/{{ task.id }}">{{ task|truncatechars:30 }}</a>
-                                <p class="{{ task.status }}">{{ task.status|title }}</p>
+                                <p class="{{ task.status|join:"-" }}">{{ task.status|title }}</p>
                                 <p class="{{ task.priority }}">{{ task.priority|title }}</p>
                             </div>
                         {% endfor %}
@@ -148,27 +154,102 @@
                 </div>
             </div>
         </div>
+        {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
+            <div id="update-container">
+                <button id="update-task">Update Task</button>
+            </div>
+        {% endif %}
     </div>
+    {% csrf_token %}
 {% endblock content %}
 
 {% block script %}
     <script>
         window.onload = function () {
-            let ele = document.querySelectorAll(".inner-field a");
-            [...ele].map(x => x.addEventListener("click", openMenu))
+            let editMenu = document.querySelectorAll(".inner-field a");
+            let dropdownMenus = document.querySelectorAll("div.dropdown");
+            let updateBtn = document.getElementById("update-task");
+
+            updateBtn.addEventListener('click', updateTask)
+
+            async function updateTask(ev) {
+                let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                let data = {
+                    'priority': document.querySelector('.inner-field .priority').innerText,
+                    'status': document.querySelector('.inner-field .status').innerText,
+                    'resolution': document.querySelector('.inner-field .resolution').innerText,
+                    'assignee': document.querySelector('a.assignee').innerText,
+                    'logged': document.querySelector('p.logged').innerText.slice(0, -1),
+                    'title': document.querySelector('.container h1').innerText,
+                    'description': document.querySelector('textarea').value,
+                }
+
+                let request = await fetch('{% url 'update_task' task.id  %}',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            "X-CSRFToken": csrf_token,
+                        },
+                        body: JSON.stringify(data)
+                    }
+                )
+                console.log(await request.json())
+            }
+
+            const innerPriority = document.querySelector('.inner-field .priority').innerText
+            const innerStatus = document.querySelector('.inner-field .status').innerText
+            const innerResolution = document.querySelector('.inner-field .resolution').innerText
+
+            let initialValues = {
+                'priority-dropdown': innerPriority,
+                'status-dropdown': innerStatus,
+                'resolution-dropdown': innerResolution,
+            };
+
+
+            [...editMenu].map(x => x.addEventListener("click", openMenu));
+            [...dropdownMenus].map(x => x.addEventListener("click", changeItem));
+
             let toggleMap = {
                 'status': document.getElementById('status-dropdown'),
                 'priority': document.getElementById('priority-dropdown'),
                 'resolution': document.getElementById('resolution-dropdown'),
             }
+            let menuMap = {
+                'status-dropdown': document.querySelector('.inner-field .status'),
+                'priority-dropdown': document.querySelector('.inner-field .priority'),
+                'resolution-dropdown': document.querySelector('.inner-field .resolution'),
+            }
 
             function openMenu(ev) {
                 let parentElement = ev.target.parentNode.parentNode.parentNode
                 let element = toggleMap[parentElement.id]
-                closeOptions(element)
                 element.classList.toggle('show');
             }
+
+            function changeItem(ev) {
+                let elementId = ev.target.parentNode.id
+                let element = menuMap[elementId]
+                let value = element.innerText.toLowerCase()
+                closeOptions(element)
+                element.innerText = ev.target.innerText
+                element.classList.remove(value)
+                if (ev.target.innerText.toLowerCase() === 'in progress') {
+                    element.classList.remove(value)
+                    element.classList.add('in-progress')
+                } else {
+                    element.classList.remove('in-progress')
+                    element.classList.add(ev.target.innerText.toLowerCase())
+                }
+                if (element.innerText.toLowerCase() !== initialValues[elementId].toLowerCase()) {
+                    element.style.fontWeight = 'bold';
+                } else {
+                    element.style.fontWeight = 'normal';
+                }
+            }
         }
+
 
         window.onclick = function (event) {
             if (!event.target.matches('.dropdown')) {

@@ -1,7 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.generic import DetailView
+import json
 
 from .forms import TaskCreationForm, TaskEditForm
 from django.contrib import messages
@@ -106,19 +108,29 @@ def index(request):
 
 @login_required
 def task_details(request, task_id):
-    task = Task.objects.get(id=task_id)
-    subtasks = Task.objects.all().filter(parent_task=task)
-    return render(request, 'task_details.html',
-                  {'task': task,
-                   'subtasks':subtasks})
+    if request.method == 'GET':
+        task = Task.objects.get(id=task_id)
+        subtasks = Task.objects.all().filter(parent_task=task)
+        return render(request, 'task_details.html',
+                      {'task': task,
+                       'subtasks': subtasks})
+
+{'priority': 'Low', 'status': 'Opened', 'resolution': 'Unresolved', 'assignee': 'Kalata', 'logged': 'Logged', 'title': 'Task 1', 'description': 'Hehehe'}
 
 
 @login_required
-def edit_task_details(request, task_id):
+def update_task(request, task_id):
     task = Task.objects.get(id=task_id)
     if request.method == 'POST':
-        pass
-    else:
-        task_form = TaskEditForm(instance=task)
-        return render(request, 'task_details.html',
-                      {'form': task_form})
+        task_values = json.loads(request.body)
+        task.priority = task_values['priority']
+        task.status = task_values['status']
+        task.resolution = task_values['resolution']
+        assignee = User.objects.get(username=task_values['assignee'])
+        task.assignee = assignee
+        task.logged = task_values['logged']
+        task.title = task_values['title']
+        task.description = task_values['description']
+        task.save()
+        payload = {'status': 'Task successfully updated'}
+        return JsonResponse(payload)
