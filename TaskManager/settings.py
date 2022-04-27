@@ -27,7 +27,9 @@ SECRET_KEY = utilities.APP_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://task-manager-softuni.herokuapp.com/','localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['https://task-manager-softuni.herokuapp.com/',
+                 'localhost',
+                 '127.0.0.1:8000']
 
 # Application definition
 
@@ -40,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'manager',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +56,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': utilities.CLOUD_NAME,
+    'API_KEY': utilities.API_KEY,
+    'API_SECRET': utilities.API_SECRET
+}
 
 ROOT_URLCONF = 'TaskManager.urls'
 
@@ -140,4 +150,6 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
