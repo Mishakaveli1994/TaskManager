@@ -9,5 +9,6 @@ urlpatterns = [
     path('projects/', views.projects, name='projects'),
     path('tasks/tasks.json', views.tasks_listing, name='tasks-api'),
     path('tasks/<int:task_id>', views.task_details, name='task_details'),
-    path('update_task/<int:task_id>', views.update_task, name='update_task')
+    path('update_task/<int:task_id>', views.update_task, name='update_task'),
+    path('administration', views.administration, name='administration')
 ]

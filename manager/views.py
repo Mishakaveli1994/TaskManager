@@ -114,6 +114,7 @@ def task_details(request, task_id):
                       {'task': task,
                        'subtasks': subtasks})
 
+
 @login_required
 def update_task(request, task_id):
     task = Task.objects.get(id=task_id)
@@ -131,3 +132,24 @@ def update_task(request, task_id):
         task.save()
         payload = {'status': 'Task successfully updated'}
         return JsonResponse(payload)
+
+
+@group_required('Manager', 'Admin')
+@login_required
+def administration(request):
+    if request.method == 'POST':
+        task_form = TaskCreationForm(request.POST)
+        if task_form.is_valid():
+            new_task = task_form.save(commit=False)
+            new_task.author = request.user
+            task_form.save()
+            messages.success(request, 'Task created successfully!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'There were problems with creating the task.')
+    else:
+        users = User.objects.all().exclude(id=request.user.id)
+    return render(request,
+                  'administration.html',
+                  {'users': users,
+                   'section': 'administration'})

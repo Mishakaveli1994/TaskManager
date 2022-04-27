@@ -1,8 +1,97 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load auth_filter %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/administration.css' %}">
+{% endblock css %}
 
 {% block title %}Administration Panel{% endblock title %}
 
 {% block content %}
     <h1>Administration Panel</h1>
-    <p>Welcome to the administration panel</p>
+    <h2>Welcome to the administration panel</h2>
+    <table class="users-admin">
+        <thead>
+        <tr>
+            <td>Username</td>
+            <td>First Name</td>
+            <td>Last Name</td>
+            <td>Date of Birth</td>
+            <td>Email</td>
+            <td>Position</td>
+            <td>Reset</td>
+            <td>Save Changes</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td><a href="{% url 'profile' user.username %}">{{ user.username }}</a></td>
+                <td><p>{{ user.first_name }}</p></td>
+                <td><p>{{ user.last_name }}</p></td>
+                {% if user.profile.date_of_birth is not None %}
+                    <td><p>{{ user.profile.date_of_birth }}</p></td>
+                {% else %}
+                    <td><p>Not Specified</p></td>
+                {% endif %}
+                <td><p>{{ user.email }}</p></td>
+                <td><select class="position" data-initial=
+                        {% if user|has_group:"Employee" %}employee{% elif user|has_group:"Manager" %}manager{% elif user|has_group:"Admin" %}admin{% endif %}>
+                    <option value="employee" {% if user|has_group:"Employee" %} selected{% endif %}>Employee</option>
+                    <option value="manager" {% if user|has_group:"Manager" %}selected{% endif %}>Manager</option>
+                    <option value="admin" {% if user|has_group:"Admin" %}selected{% endif %}>Admin</option>
+                </select></td>
+                <td>
+                    <button class="reset-user-group">Reset Changes</button>
+                </td>
+                <td>
+                    <button class="save-user-group">Save Changes</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock content %}
+
+{% block script %}
+    <script>
+        window.onload = function () {
+            let selects = document.querySelectorAll(".position");
+            let resetBtn = document.querySelectorAll('.reset-user-group');
+            let saveBtn = document.querySelectorAll('.save-user-group');
+
+            [...selects].map(x => x.addEventListener("change", changePosition));
+            [...resetBtn].map(x => x.addEventListener("click", resetPosition));
+            [...saveBtn].map(x => x.addEventListener("click", savePosition));
+
+            function resetPosition(ev) {
+                let select = ev.target.parentNode.parentNode.childNodes[11].childNodes[0];
+                let defaultValue = select.getAttribute('data-initial');
+                [...select.querySelectorAll('option')].map(e => e.value === defaultValue ? e.selected=true : '')
+                select.classList.remove('highlighted')
+            }
+
+            function savePosition(ev) {
+                let select = ev.target.parentNode.parentNode
+                console.log(select)
+            }
+
+            function changePosition(ev) {
+                let parentSelect = ev.target
+                let selectedOption = parentSelect.options[parentSelect.selectedIndex]
+                let value = selectedOption.value;
+                let text = selectedOption.text;
+                let initialValue = parentSelect.getAttribute('data-initial')
+                if (initialValue !== value) {
+                    selectedOption.selected=true;
+                    parentSelect.classList.add('highlighted')
+                } else {
+                    parentSelect.classList.remove('highlighted')
+                }
+            }
+        }
+    </script>
+
+
+{% endblock script %}

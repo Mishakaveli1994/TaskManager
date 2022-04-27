@@ -1,0 +1,61 @@
+h1,
+h2 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.highlighted {
+    background: #FC6620;
+    color: white;
+    font-weight: bold;
+}
+
+.users-admin {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 1em;
+    text-align: center;
+    border: 3px solid darkgray;
+    border-radius: 10px;
+}
+
+.users-admin thead {
+    font-weight: bold;
+
+}
+
+.users-admin tr {
+    margin: 5px 0;
+    border: 2px solid;
+}
+
+.users-admin td {
+    padding: 10px 0;
+}
+
+.users-admin tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.reset-user-group,
+.save-user-group {
+    padding: 7px 12px;
+    font-weight: bold;
+    background: #18596D;
+    border: 1px solid;
+    color: white;
+    border-radius: 3px;
+}
+
+.reset-user-group:hover,
+.save-user-group:hover {
+    background: white;
+    color: #FC6620;
+    transition: 0.3s;
+    cursor: pointer;
+    border: 1px solid;
+}
+
+.position {
+    padding: 5px 10px;
+}
