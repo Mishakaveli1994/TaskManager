@@ -38,22 +38,25 @@ h2 {
 }
 
 .reset-user-group,
-.save-user-group {
+.save-user-group,
+.delete-user{
     padding: 7px 12px;
     font-weight: bold;
     background: #18596D;
     border: 1px solid;
     color: white;
     border-radius: 3px;
+    white-space: nowrap;
 }
 
 .reset-user-group:hover,
-.save-user-group:hover {
+.save-user-group:hover,
+.delete-user:hover{
     background: white;
-    color: #FC6620;
     transition: 0.3s;
     cursor: pointer;
     border: 1px solid;
+    color: #FC6620;
 }
 
 .position {

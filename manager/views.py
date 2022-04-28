@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 import json
-
+from django.db.models import Q
 from .forms import TaskCreationForm
 from django.contrib import messages
 from group_validation import group_required
@@ -42,7 +42,7 @@ def tasks_listing(request):
     elif user.groups.filter(name='Manager').exists():
         tasks = Task.objects.all().filter(author=user.id).order_by('-updated')
     elif user.groups.filter(name='Employee').exists():
-        tasks = Task.objects.all().filter(assignee=user.id).order_by('-updated')
+        tasks = Task.objects.all().filter(Q(assignee=None) | Q(assignee=user.id)).order_by('-updated')
     paginator = Paginator(tasks, per_page)
     page_obj = paginator.get_page(page_number)
     data = [{'id': kw.id,
@@ -65,15 +65,18 @@ def tasks_listing(request):
 
 @group_required('Manager', 'Admin')
 @login_required
-def create_task(request):
+def create_task(request, task_id=None):
+    print(task_id)
     if request.method == 'POST':
         task_form = TaskCreationForm(request.POST)
         if task_form.is_valid():
             new_task = task_form.save(commit=False)
             new_task.author = request.user
+            if task_id is not None:
+                new_task.parent_task = Task.objects.get(id=task_id)
             task_form.save()
             messages.success(request, 'Task created successfully!')
-            return redirect('dashboard')
+            return redirect(f'/tasks/{new_task.id}')
         else:
             messages.error(request, 'There were problems with creating the task.')
     else:
@@ -120,7 +123,6 @@ def update_task(request, task_id):
     task = Task.objects.get(id=task_id)
     if request.method == 'POST':
         task_values = json.loads(request.body)
-        print(task_values)
         task.priority = task_values['priority']
         task.status = task_values['status']
         task.resolved = task_values['resolution']
@@ -154,3 +156,37 @@ def administration(request):
                   {'users': users,
                    'section': 'administration'})
 
+
+@group_required('Admin', 'Manager', 'Employee')
+@login_required
+def assign_to_me(request):
+    if request.method == 'POST':
+        try:
+            values = json.loads(request.body)
+            task = Task.objects.get(id=values['task_id'])
+            if values['user_id'] == 'None':
+                task.assignee = None
+            else:
+                user = User.objects.get(id=values['user_id'])
+                task.assignee = user
+            task.save()
+            payload = {'message': 'Task successfully assigned',
+                       'status': 200}
+        except Exception as e:
+            print(e)
+            payload = {'message': 'There was a problem with assigning the task',
+                       'status': 100}
+
+        return JsonResponse(payload)
+
+
+def delete_task(request,task_id):
+    try:
+        task = Task.objects.get(id=task_id)
+        task.delete()
+        messages.success(request, 'Task created successfully!')
+    except Exception:
+        messages.error(request, 'There was a problem with deleting the task!')
+    return render(request,
+                  'dashboard.html',
+                  {'section': 'dashboard'})

@@ -126,9 +126,29 @@ def update_user_group(request):
             user.profile.position = values['newGroup'].lower()
             user.save()
             user.profile.save()
-            payload = {'status': 'User successfully updated'}
+            payload = {'message': 'User successfully updated',
+                       'status': 200}
         except Exception as e:
-            payload = {'status': 'There was a problem with updating the user',
-                       'error': e}
+            print(e)
+            payload = {'message': 'There was a problem with updating the user',
+                       'status': 100}
 
         return JsonResponse(payload)
+
+
+@login_required
+def delete_user(request):
+    if request.method == 'POST':
+        try:
+            values = json.loads(request.body)
+            user = User.objects.get(username=values['userSlug'])
+            user.delete()
+            payload = {'message': 'User successfully deleted',
+                       'status': 200}
+        except Exception as e:
+            print(e)
+            payload = {'message': 'There was a problem with deleting the user',
+                       'status': 100}
+
+        return JsonResponse(payload)
+

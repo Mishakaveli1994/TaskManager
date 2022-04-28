@@ -41,6 +41,21 @@
             ev.target.parentElement.remove()
         }
     }
+
+    function tempAlert(msg, duration, status) {
+        let el = document.createElement("div");
+        el.classList.add('status-message')
+        if (status === 200) {
+            el.setAttribute("style", "background:#81ce81;");
+        } else {
+            el.setAttribute("style", "background:#ED4337;");
+        }
+        el.innerHTML = msg;
+        setTimeout(function () {
+            el.parentNode.removeChild(el);
+        }, duration);
+        document.body.appendChild(el);
+    }
 </script>
 {% block script %}
 {% endblock script %}

@@ -33,17 +33,17 @@
     font-weight: bold;
     display: flex;
     justify-content: space-around;
-        text-shadow: -1px -1px 1px rgba(255,255,255,.1), 1px 1px 1px rgba(0,0,0,.5);
+    text-shadow: -1px -1px 1px rgba(255, 255, 255, .1), 1px 1px 1px rgba(0, 0, 0, .5);
 }
 
 .success a,
 .error a {
     text-decoration: none;
-    font-size:14px;
-    color:black;
-    padding:2px 15px;
-    background:white;
-    border-radius:3px;
+    font-size: 14px;
+    color: black;
+    padding: 2px 15px;
+    background: white;
+    border-radius: 3px;
 }
 
 .success {
@@ -52,4 +52,15 @@
 
 .error {
     background: #ED4337;
+}
+
+.status-message {
+    position: absolute;
+    top: 6.3%;
+    left: 50%;
+    padding: 20px 50px;
+    border-radius: 8px;
+    transform: translate(-50%, 0%);
+    color:white;
+    font-weight: bold;
 }

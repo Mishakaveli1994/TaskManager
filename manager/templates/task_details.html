@@ -81,8 +81,15 @@
                             {% endif %}
                             {% if task.assignee %}
                                 <a class="assignee" href="/account/profile/{{ task.assignee }}">{{ task.assignee }}</a>
+                                {% if request.user == task.author or request.user|has_group:"Admin" %}
+                                    <div id="delete-assignee-btn">
+                                        <button id="remove-assignee">Remove assignee</button>
+                                    </div>
+                                {% endif %}
                             {% else %}
-                                <p>None</p>
+                                <a>None</a>
+                                <div id="delete-assignee-btn">
+                                </div>
                             {% endif %}
                             <button id="assign-me">Assign to me</button>
                         </div>
@@ -140,12 +147,14 @@
                         </ul>
                     </div>
                 </div>
-
-
             </div>
         </div>
         <div class="subtasks-container">
-            <p class="header-p">Subtasks</p>
+            <div class="subtask-header">
+                <p class="header-p">Subtasks</p>
+                <a id="create-new-subtask" href="{% url 'create_subtask' task.id %}">Create new subtask</a>
+            </div>
+
             <div class="subtasks">
                 <div class="subtasks-header">
                     <p>Task</p>
@@ -164,6 +173,9 @@
         {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
             <div id="update-container">
                 <button id="update-task">Update Task</button>
+                {% if request.user == task.author or request.user|has_group:"Admin" %}
+                    <button id="delete-task">Delete Task</button>
+                {% endif %}
             </div>
         {% endif %}
     </div>
@@ -177,47 +189,85 @@
             let dropdownMenus = document.querySelectorAll("div.dropdown");
             let updateBtn = document.getElementById("update-task");
             let assignBtn = document.getElementById("assign-me");
+            let removeAssignee = document.getElementById("delete-assignee-btn");
+            let deleteTaskBtn = document.getElementById("delete-task")
 
             updateBtn.addEventListener('click', updateTask)
             assignBtn.addEventListener('click', updateAssignee)
+            removeAssignee.addEventListener('click', updateAssignee)
+            deleteTaskBtn.addEventListener('click', deleteTask)
 
-            function updateAssignee(ev) {
+            function deleteTask(ev) {
+                let confirmation = confirm('Are you sure you want to delete this task ?')
+                if (confirmation) {
+                    window.location.href = '{% url 'delete_task' task.id %}'
+                }
+            }
+
+            async function updateAssignee(ev) {
                 let assigneeElementImg = document.querySelector(".assignee-img img")
                 let assigneeElementA = document.querySelector(".assignee-img a")
-                assigneeElementA.href = '/account/profile/' + "{{ user.username }}"
-                assigneeElementA.innerText = "{{ user.username }}"
-                assigneeElementImg.src = "{{ user.profile.photo.url }}"
+                if (ev.target.id === 'remove-assignee') {
+                    assigneeElementA.href = ''
+                    assigneeElementA.classList.remove('assignee')
+                    assigneeElementA.innerText = "None"
+                    assigneeElementImg.src = "{% static 'img/no_photo.png' %}"
+                    let request = await assignToMe("{% url 'assign_to_me' %}", "{{task.id}}", "None")
+                    tempAlert(request.message, 2000, request.status);
+                    ev.target.remove()
+                } else if (ev.target.id === 'assign-me') {
+                    assigneeElementA.href = '/account/profile/' + "{{ user.username }}"
+                    assigneeElementA.classList.add('assignee')
+                    assigneeElementA.innerText = "{{ user.username }}"
+                    assigneeElementImg.src = "{{ user.profile.photo.url }}"
+                    let request = await assignToMe("{% url 'assign_to_me' %}", "{{task.id}}", "{{ user.id }}")
+                    tempAlert(request.message, 2000, request.status);
+                    document.getElementById('delete-assignee-btn').innerHTML = '<button id="remove-assignee">Remove assignee</button>'
+                }
             }
 
             async function updateTask(ev) {
                 let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
-                let data = {
-                    'priority': document.querySelector('.inner-field .priority').innerText,
-                    'status': document.querySelector('.inner-field .status').innerText,
-                    'resolution': document.querySelector('.inner-field .resolution').innerText,
-                    'assignee': document.querySelector('a.assignee').innerText,
-                    'logged': document.querySelector('p.logged').innerText.slice(0, -1),
-                    'title': document.querySelector('.container h1').innerText,
-                    'description': document.querySelector('textarea').value,
+                try {
+                    let data = {
+                        'priority': document.querySelector('.inner-field .priority').innerText,
+                        'status': document.querySelector('.inner-field .status').innerText,
+                        'resolution': document.querySelector('.inner-field .resolution').innerText,
+                        'assignee': document.querySelector('a.assignee').innerText,
+                        'logged': document.querySelector('p.logged').innerText.slice(0, -1),
+                        'title': document.querySelector('.container h1').innerText,
+                        'description': document.querySelector('textarea').value,
+                    }
+                    let request = await fetch('{% url 'update_task' task.id  %}',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                "X-CSRFToken": csrf_token,
+                            },
+                            body: JSON.stringify(data)
+                        }
+                    )
+                    console.log(await request.json());
+                    [...document.querySelectorAll('.bold')].map(x => x.classList.remove('bold'))
+                } catch (e) {
+                    tempAlert('No assignee, can\'t change Task status', 2000, 100);
                 }
 
-                let request = await fetch('{% url 'update_task' task.id  %}',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            "X-CSRFToken": csrf_token,
-                        },
-                        body: JSON.stringify(data)
-                    }
-                )
-                console.log(await request.json());
-                [...document.querySelectorAll('.bold')].map(x => x.classList.remove('bold'))
             }
 
             const innerPriority = document.querySelector('.inner-field .priority').innerText
             const innerStatus = document.querySelector('.inner-field .status').innerText
             const innerResolution = document.querySelector('.inner-field .resolution').innerText
+            let close = document.querySelectorAll('.close');
+
+            [...close].map(e => e.addEventListener('click', closeBtn))
+
+            function closeBtn(ev) {
+                console.log(ev.target)
+                ev.preventDefault();
+                ev.target.parentElement.remove()
+            }
 
             let initialValues = {
                 'priority-dropdown': innerPriority,
@@ -269,6 +319,26 @@
                     element.classList.remove('bold');
                 }
             }
+        }
+
+        async function assignToMe(url, task_id, user_id) {
+            let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
+            let data = {
+                'task_id': task_id,
+                'user_id': user_id,
+            }
+
+            const urlWithParams = url + "?" + new URLSearchParams({})
+            const response = await fetch(urlWithParams, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "X-CSRFToken": csrf_token,
+                    },
+                    body: JSON.stringify(data)
+                }
+            );
+            return response.json();
         }
 
 

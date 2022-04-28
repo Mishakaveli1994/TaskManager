@@ -269,7 +269,8 @@ div.dropdown a:hover {
     justify-content: space-around;
 }
 
-#update-task {
+#update-task,
+#delete-task{
     margin-top: 40px;
     padding: 10px 20px;
     border-radius: 5px;
@@ -286,11 +287,20 @@ div.dropdown a:hover {
     background: white;
 }
 
+#delete-task:hover {
+    color: white;
+    transition: 0.3s;
+    cursor: pointer;
+    background: #ED4337;
+}
+
 .bold {
     font-weight: bold;
 }
 
-#assign-me {
+#assign-me,
+#remove-assignee
+{
     margin: auto;
     padding: 5px 10px;
     border-radius: 5px;
@@ -300,16 +310,39 @@ div.dropdown a:hover {
     color: white;
 }
 
-#assign-me:hover {
+#create-new-subtask {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid;
+    background: #18596D;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+#assign-me:hover,
+#remove-assignee:hover,
+#create-new-subtask:hover {
     color: #FC6620;
     transition: 0.3s;
     cursor: pointer;
     background: white;
 }
 
-#tracked-time{
+#tracked-time {
     width: 90%;
     height: 120px;
-    margin:10px 20px;
-    background:white;
+    margin: 10px 20px;
+    background: white;
+}
+
+.subtask-header {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+    justify-content: center;
+}
+
+#delete-assignee-btn{
+    margin-left:100px;
 }

@@ -22,6 +22,7 @@
             <td>Position</td>
             <td>Reset</td>
             <td>Save Changes</td>
+            <td>Delete User</td>
         </tr>
         </thead>
         <tbody>
@@ -45,6 +46,9 @@
                 <td class="reset-changes-btn">
                 </td>
                 <td class="save-changes-btn">
+                </td>
+                <td class="delete-user-btn">
+                    <button class="delete-user">Delete</button>
                 </td>
             </tr>
         {% endfor %}
@@ -81,11 +85,23 @@
                         let newGroupTr = ev.target.parentNode.parentNode.querySelector('.position')
                         let newGroup = newGroupTr.options[newGroupTr.selectedIndex].text
 
-                        let request = await updateUser("{% url 'update_user_group' %}", user, newGroup)
-                        console.log(request)
-                        newGroupTr.classList.remove('highlighted')
-                        resetBtnTr.childNodes[1].remove()
-                        saveBtnTr.childNodes[1].remove()
+                        let request = await updateUserGroup("{% url 'update_user_group' %}", user, newGroup)
+                        tempAlert(request.message, 2000, request.status);
+                        if (request.status === 200) {
+                            newGroupTr.classList.remove('highlighted')
+                            resetBtnTr.childNodes[1].remove()
+                            saveBtnTr.childNodes[1].remove()
+                        }
+                    } else if (ev.target.className.includes('delete-user')) {
+                        let user = ev.target.parentNode.parentNode.querySelector('.user-slug').innerText
+                        let confirmation = confirm('Are you sure you want to delete this user ?')
+                        if (confirmation) {
+                            let request = await deleteUser("{% url 'delete_user' %}", user)
+                            tempAlert(request.message, 2000, request.status);
+                            if (request.status === 200) {
+                                ev.target.parentNode.parentNode.remove()
+                            }
+                        }
                     }
                 }
             }
@@ -123,7 +139,28 @@
             }
         }
 
-        async function updateUser(url, userSlug, newGroup) {
+        async function updateUserGroup(url, userSlug) {
+            let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
+            let data = {
+                'userSlug': userSlug,
+            }
+
+            const urlWithParams = url + "?" + new URLSearchParams({
+                userSlug: userSlug,
+            })
+            const response = await fetch(urlWithParams, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "X-CSRFToken": csrf_token,
+                    },
+                    body: JSON.stringify(data)
+                }
+            );
+            return response.json();
+        }
+
+        async function deleteUser(url, userSlug, newGroup) {
             let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
             let data = {
                 'userSlug': userSlug,
@@ -143,6 +180,21 @@
                 }
             );
             return response.json();
+        }
+
+        function tempAlert(msg, duration, status) {
+            let el = document.createElement("div");
+            el.classList.add('status-message')
+            if (status === 200) {
+                el.setAttribute("style", "background:#81ce81;");
+            } else {
+                el.setAttribute("style", "background:#ED4337;");
+            }
+            el.innerHTML = msg;
+            setTimeout(function () {
+                el.parentNode.removeChild(el);
+            }, duration);
+            document.body.appendChild(el);
         }
     </script>
 

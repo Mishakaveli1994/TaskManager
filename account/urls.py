@@ -11,4 +11,5 @@ urlpatterns = [
     path('edit/<slug:slug>', views.edit, name='edit'),
     path('profile/<slug:slug>', views.profile, name='profile'),
     path('update_user_groups/', views.update_user_group, name='update_user_group'),
+    path('delete_user/', views.delete_user, name='delete_user'),
 ]
