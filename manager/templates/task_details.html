@@ -18,7 +18,8 @@
                         <div class="inner-field">
                             <p class="priority {{ task.priority }}">{{ task.priority|title }}</p>
                             {% if request.user == task.author or request.user|has_group:"Admin" %}
-                                <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                                <a href="#" id="priority-options" class="dropdown"><i
+                                        class="fa-solid fa-pencil dropdown"></i></a>
                             {% endif %}
                         </div>
                     </div>
@@ -32,7 +33,8 @@
                         <div class="inner-field">
                             <p class="status  {{ task.status|lower }}">{{ task.status|title }}</p>
                             {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
-                                <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                                <a href="#" id="status-options" class="dropdown"><i
+                                        class="fa-solid fa-pencil dropdown"></i></a>
                             {% endif %}
                         </div>
                     </div>
@@ -47,7 +49,8 @@
                         <div class="inner-field">
                             <p class="resolution {{ task.resolved }}">{{ task.resolved|title }}</p>
                             {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
-                                <a href="#" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>
+                                <a href="#" id="resolution-options" class="dropdown"><i
+                                        class="fa-solid fa-pencil dropdown"></i></a>
                             {% endif %}
                         </div>
                     </div>
@@ -81,11 +84,9 @@
                             {% endif %}
                             {% if task.assignee %}
                                 <a class="assignee" href="/account/profile/{{ task.assignee }}">{{ task.assignee }}</a>
-                                {% if request.user == task.author or request.user|has_group:"Admin" %}
-                                    <div id="delete-assignee-btn">
-                                        <button id="remove-assignee">Remove assignee</button>
-                                    </div>
-                                {% endif %}
+                                <div id="delete-assignee-btn">
+                                    <button id="remove-assignee">Remove assignee</button>
+                                </div>
                             {% else %}
                                 <a>None</a>
                                 <div id="delete-assignee-btn">
@@ -122,7 +123,13 @@
                 </div>
 
                 <div class="time-tracking-container">
-                    <p class="header-p">Time Tracking</p>
+                    <div id="track-time">
+                        <p class="header-p">Time Tracking</p>
+                        {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
+                            <button id="track-time-btn">Track Time</button>
+                        {% endif %}
+                    </div>
+
                     <div class="time-tracking">
                         <div class="time-tracking-left">
                             <p class="estimated">Estimated:</p>
@@ -170,14 +177,14 @@
                 {% endfor %}
             </div>
         </div>
-        {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
-            <div id="update-container">
+        <div id="update-container">
+            {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
                 <button id="update-task">Update Task</button>
                 {% if request.user == task.author or request.user|has_group:"Admin" %}
                     <button id="delete-task">Delete Task</button>
                 {% endif %}
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
     {% csrf_token %}
 {% endblock content %}
@@ -191,17 +198,41 @@
             let assignBtn = document.getElementById("assign-me");
             let removeAssignee = document.getElementById("delete-assignee-btn");
             let deleteTaskBtn = document.getElementById("delete-task")
+            let trackTimeBtn = document.getElementById("track-time-btn")
+            let assignee = "{{ task.assignee }}"
 
-            updateBtn.addEventListener('click', updateTask)
+            document.getElementById('create-new-subtask').addEventListener('click', (ev)=>{
+                let authorized = "{% if request.user|has_group:"Admin" or request.user == task.author %}yes{% else %}no{% endif %}"
+                if (authorized === 'no'){
+                    tempAlert('You are not authorized to create new subtasks', 2000, 100);
+                    ev.preventDefault()
+                }
+            })
+
+            if (updateBtn != null) {
+                updateBtn.addEventListener('click', updateTask)
+            }
+
+            if (trackTimeBtn != null) {
+                trackTimeBtn.addEventListener('click', trackTime)
+            }
+
             assignBtn.addEventListener('click', updateAssignee)
             removeAssignee.addEventListener('click', updateAssignee)
-            deleteTaskBtn.addEventListener('click', deleteTask)
+
+            if (deleteTaskBtn != null) {
+                deleteTaskBtn.addEventListener('click', deleteTask)
+            }
 
             function deleteTask(ev) {
                 let confirmation = confirm('Are you sure you want to delete this task ?')
                 if (confirmation) {
                     window.location.href = '{% url 'delete_task' task.id %}'
                 }
+            }
+
+            function trackTime(ev) {
+
             }
 
             async function updateAssignee(ev) {
@@ -215,14 +246,64 @@
                     let request = await assignToMe("{% url 'assign_to_me' %}", "{{task.id}}", "None")
                     tempAlert(request.message, 2000, request.status);
                     ev.target.remove()
+                    let trackTimeBtn = document.getElementById('track-time-btn')
+                    let updateTaskBtn = document.getElementById('update-task')
+                    if (trackTimeBtn) {
+                        trackTimeBtn.remove()
+                    }
+                    if (updateTaskBtn) {
+                        updateTaskBtn.remove()
+                    }
+                    assignee = "None"
+                    let statusOptions = document.getElementById('status-options')
+                    let resolutionOptions = document.getElementById('resolution-options')
+
+                    statusOptions.remove()
+                    resolutionOptions.remove()
+
                 } else if (ev.target.id === 'assign-me') {
+                    if (assignee === "{{ user.username }}") {
+                        tempAlert('You are already assigned to this task', 2000, 100);
+                        return
+                    }
+                    assignee = "{{ user.username }}"
                     assigneeElementA.href = '/account/profile/' + "{{ user.username }}"
                     assigneeElementA.classList.add('assignee')
                     assigneeElementA.innerText = "{{ user.username }}"
-                    assigneeElementImg.src = "{{ user.profile.photo.url }}"
+                    if ("{{ user.profile.photo }}".length > 1) {
+                        assigneeElementImg.src = "{% if user.profile.photo %}{{ user.profile.photo.url }}{% endif %}"
+                    } else {
+                        assigneeElementImg.src = "{% static 'img/no_photo.png' %}"
+                    }
+
                     let request = await assignToMe("{% url 'assign_to_me' %}", "{{task.id}}", "{{ user.id }}")
                     tempAlert(request.message, 2000, request.status);
+
                     document.getElementById('delete-assignee-btn').innerHTML = '<button id="remove-assignee">Remove assignee</button>'
+
+                    document.getElementById('update-container').innerHTML = '<button id="update-task">Update Task</button>'
+
+                    let trackBtn = document.createElement('button')
+                    let updateTaskBtn = document.getElementById('update-task')
+                    updateTaskBtn.addEventListener('click', updateTask)
+                    trackBtn.id = 'track-time-btn'
+                    trackBtn.innerText = 'Track Time'
+                    if (!document.getElementById('track-time-btn')) {
+                        document.getElementById('track-time').appendChild(trackBtn)
+                        trackTimeBtn = document.getElementById("track-time-btn")
+                        trackTimeBtn.addEventListener('click', trackTime)
+                    }
+                    let resolutionField = document.querySelector('#resolution').querySelector('.inner-field')
+                    let statusField = document.querySelector('#status').querySelector('.inner-field')
+                    resolutionField.innerHTML += '<a href="#" id="resolution-options" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>';
+                    statusField.innerHTML += '<a href="#" id="status-options" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>';
+                    editMenu = document.querySelectorAll(".inner-field a");
+                    [...editMenu].map(x => x.addEventListener("click", openMenu));
+                    menuMap = {
+                        'status-dropdown': document.querySelector('.inner-field .status'),
+                        'priority-dropdown': document.querySelector('.inner-field .priority'),
+                        'resolution-dropdown': document.querySelector('.inner-field .resolution'),
+                    }
                 }
             }
 
@@ -264,7 +345,6 @@
             [...close].map(e => e.addEventListener('click', closeBtn))
 
             function closeBtn(ev) {
-                console.log(ev.target)
                 ev.preventDefault();
                 ev.target.parentElement.remove()
             }
@@ -309,10 +389,8 @@
                 if (newValue === 'in progress') {
                     newValue = 'in-progress'
                 }
-                console.log(value, newValue)
                 element.classList.remove(value)
                 element.classList.add(newValue)
-
                 if (element.innerText.toLowerCase() !== initialValues[elementId].toLowerCase()) {
                     element.classList.add('bold');
                 } else {

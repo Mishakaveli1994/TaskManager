@@ -74,7 +74,7 @@
 
                 if (ev.target.tagName === 'BUTTON') {
                     if (ev.target.className.includes('reset-user-group')) {
-                        let select = ev.target.parentNode.querySelector('.position');
+                        let select = ev.target.parentNode.parentNode.querySelector('.position');
                         let defaultValue = select.getAttribute('data-initial');
                         [...select.querySelectorAll('option')].map(e => e.value === defaultValue ? e.selected = true : '')
                         select.classList.remove('highlighted')
@@ -84,7 +84,6 @@
                         let user = ev.target.parentNode.parentNode.querySelector('.user-slug').innerText
                         let newGroupTr = ev.target.parentNode.parentNode.querySelector('.position')
                         let newGroup = newGroupTr.options[newGroupTr.selectedIndex].text
-
                         let request = await updateUserGroup("{% url 'update_user_group' %}", user, newGroup)
                         tempAlert(request.message, 2000, request.status);
                         if (request.status === 200) {
@@ -139,7 +138,7 @@
             }
         }
 
-        async function updateUserGroup(url, userSlug) {
+        async function deleteUser(url, userSlug) {
             let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
             let data = {
                 'userSlug': userSlug,
@@ -160,7 +159,7 @@
             return response.json();
         }
 
-        async function deleteUser(url, userSlug, newGroup) {
+        async function updateUserGroup(url, userSlug, newGroup) {
             let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
             let data = {
                 'userSlug': userSlug,

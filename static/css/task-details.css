@@ -299,7 +299,8 @@ div.dropdown a:hover {
 }
 
 #assign-me,
-#remove-assignee
+#remove-assignee,
+#track-time-btn
 {
     margin: auto;
     padding: 5px 10px;
@@ -322,7 +323,8 @@ div.dropdown a:hover {
 
 #assign-me:hover,
 #remove-assignee:hover,
-#create-new-subtask:hover {
+#create-new-subtask:hover,
+#track-time-btn:hover{
     color: #FC6620;
     transition: 0.3s;
     cursor: pointer;
@@ -345,4 +347,13 @@ div.dropdown a:hover {
 
 #delete-assignee-btn{
     margin-left:100px;
+}
+
+#track-time{
+    display: flex;
+    margin: 10px 0;
+}
+
+#track-time-btn{
+    margin:0;
 }

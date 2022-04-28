@@ -119,6 +119,7 @@ def update_user_group(request):
     if request.method == 'POST':
         try:
             values = json.loads(request.body)
+            print(values['newGroup'])
             user = User.objects.get(username=values['userSlug'])
             group = Group.objects.get(name=values['newGroup'])
             user.groups.clear()

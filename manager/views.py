@@ -66,7 +66,6 @@ def tasks_listing(request):
 @group_required('Manager', 'Admin')
 @login_required
 def create_task(request, task_id=None):
-    print(task_id)
     if request.method == 'POST':
         task_form = TaskCreationForm(request.POST)
         if task_form.is_valid():
@@ -170,8 +169,12 @@ def assign_to_me(request):
                 user = User.objects.get(id=values['user_id'])
                 task.assignee = user
             task.save()
-            payload = {'message': 'Task successfully assigned',
-                       'status': 200}
+            if values['user_id'] == 'None':
+                payload = {'message': 'Assignee removed',
+                           'status': 200}
+            else:
+                payload = {'message': 'Task successfully assigned',
+                           'status': 200}
         except Exception as e:
             print(e)
             payload = {'message': 'There was a problem with assigning the task',
