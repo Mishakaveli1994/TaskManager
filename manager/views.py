@@ -134,7 +134,7 @@ def update_task(request, task_id):
         return JsonResponse(payload)
 
 
-@group_required('Manager', 'Admin')
+@group_required('Admin')
 @login_required
 def administration(request):
     if request.method == 'POST':
@@ -153,3 +153,4 @@ def administration(request):
                   'administration.html',
                   {'users': users,
                    'section': 'administration'})
+

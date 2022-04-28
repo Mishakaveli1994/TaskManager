@@ -1,4 +1,7 @@
+import json
+
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
@@ -109,3 +112,23 @@ def profile(request, slug):
                       {'current_user': current_user,
                        'profile': user_profile,
                        'profile_photo': profile_photo})
+
+
+@login_required
+def update_user_group(request):
+    if request.method == 'POST':
+        try:
+            values = json.loads(request.body)
+            user = User.objects.get(username=values['userSlug'])
+            group = Group.objects.get(name=values['newGroup'])
+            user.groups.clear()
+            user.groups.add(group)
+            user.profile.position = values['newGroup'].lower()
+            user.save()
+            user.profile.save()
+            payload = {'status': 'User successfully updated'}
+        except Exception as e:
+            payload = {'status': 'There was a problem with updating the user',
+                       'error': e}
+
+        return JsonResponse(payload)
