@@ -6,6 +6,8 @@
 ### Built With
 
 * [Django](https://www.djangoproject.com/)
+* [PostgreSQL](https://www.postgresql.org)
+* [Cloudinary](https://cloudinary.com/)
 
 <!-- GETTING STARTED -->
 ## Getting Started
