@@ -31,7 +31,7 @@
                     <div id="status">
                         <p class="status">Status:</p>
                         <div class="inner-field">
-                            <p class="status  {{ task.status|lower }}">{{ task.status|title }}</p>
+                            <p class="status  {{ task.status|lower }}">{{ task.status|replace_underscore|title }}</p>
                             {% if request.user == task.author or request.user|has_group:"Admin" or request.user == task.assignee %}
                                 <a href="#" id="status-options" class="dropdown"><i
                                         class="fa-solid fa-pencil dropdown"></i></a>
