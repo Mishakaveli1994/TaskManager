@@ -146,8 +146,9 @@ div.assignee {
 }
 
 .subtasks-header p,
-.subtask p {
-    flex-basis: 33%;
+.subtask p,
+.subtask a{
+    flex-basis: 25%;
 }
 
 .subtask {

@@ -164,12 +164,18 @@
                     <p>Task</p>
                     <p>Status</p>
                     <p>Priority</p>
+                    <p>Assigned</p>
                 </div>
                 {% for task in subtasks %}
                     <div class="subtask">
-                        <a href="/tasks/{{ task.id }}">{{ task|truncatechars:30 }}</a>
+                        <a href="/tasks/{{ task.id }}">{{ task|truncatechars:70 }}</a>
                         <p class="{{ task.status|join:"-" }}">{{ task.status|title }}</p>
                         <p class="{{ task.priority }}">{{ task.priority|title }}</p>
+                        {% if task.assignee %}
+                            <a class="assigned" href="/account/profile/{{ task.assignee }}">{{ task.assignee }}</a>
+                        {% else %}
+                            <p class="unassigned">Not Assigned</p>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -282,12 +288,12 @@
                     document.getElementById('delete-assignee-btn').innerHTML = '<button id="remove-assignee">Remove assignee</button>'
 
                     let userAuthorized = '{% if request.user == task.author or request.user|has_group:"Admin" %}yes{% else %}no{% endif %}'
-                    if (userAuthorized === 'yes'){
+                    if (userAuthorized === 'yes') {
                         document.getElementById('update-container').innerHTML = '<button id="update-task">Update Task</button>' +
                             '<button id="delete-task">Delete Task</button>'
                         let deleteTaskBtn = document.getElementById('delete-task')
                         deleteTaskBtn.addEventListener('click', deleteTask)
-                    }else{
+                    } else {
                         document.getElementById('update-container').innerHTML = '<button id="update-task">Update Task</button>'
                     }
 
@@ -324,7 +330,7 @@
                 let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
                 try {
                     let assignee = document.querySelector('a.assignee')
-                    if (assignee === null){
+                    if (assignee === null) {
                         throw new Error('No assignee, can\'t change Task status')
                     }
                     let data = {

@@ -124,7 +124,7 @@ def task_details(request, task_id):
                 return HttpResponseNotFound(f"User does not exist")
         except ObjectDoesNotExist as e:
             return HttpResponseNotFound(f"Task {task_id} does not exist")
-        subtasks = Task.objects.all().filter(parent_task=task)
+        subtasks = Task.objects.all().filter(parent_task=task).order_by('updated')
         return render(request, 'task_details.html',
                       {'task': task,
                        'subtasks': subtasks})
