@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 import json
 from django.db.models import Q
@@ -110,7 +111,13 @@ def index(request):
 @login_required
 def task_details(request, task_id):
     if request.method == 'GET':
-        task = Task.objects.get(id=task_id)
+        try:
+            try:
+                task = Task.objects.get(id=task_id)
+            except ObjectDoesNotExist as e:
+                return HttpResponseNotFound(f"User does not exist")
+        except ObjectDoesNotExist as e:
+            return HttpResponseNotFound(f"Task {task_id} does not exist")
         subtasks = Task.objects.all().filter(parent_task=task)
         return render(request, 'task_details.html',
                       {'task': task,
@@ -119,16 +126,24 @@ def task_details(request, task_id):
 
 @login_required
 def update_task(request, task_id):
-    task = Task.objects.get(id=task_id)
+    try:
+        task = Task.objects.get(id=task_id)
+    except ObjectDoesNotExist as e:
+        return HttpResponseNotFound(f"Task does not exist")
     if request.method == 'POST':
         try:
             task_values = json.loads(request.body)
             task.priority = task_values['priority']
+            if task_values['status'] == 'in progress':
+                task_values['status'] = 'in_progress'
             task.status = task_values['status']
             task.resolved = task_values['resolution']
-            assignee = User.objects.get(username=task_values['assignee'])
+            try:
+                assignee = User.objects.get(username=task_values['assignee'])
+            except ObjectDoesNotExist as e:
+                return HttpResponseNotFound(f"User does not exist")
             task.assignee = assignee
-            task.logged = task_values['logged']
+            task.tracked_time = int(task_values['logged'])
             task.title = task_values['title']
             task.description = task_values['description']
             task.full_clean()
@@ -137,25 +152,16 @@ def update_task(request, task_id):
             return JsonResponse(payload)
         except Exception as err:
             payload = {'status': 'Task update failed',
-                       'message':str(err)}
+                       'message': str(err)}
             return JsonResponse(payload)
+    else:
+        return HttpResponseNotFound(f"Method not allowed")
 
 
 @group_required('Admin')
 @login_required
 def administration(request):
-    if request.method == 'POST':
-        task_form = TaskCreationForm(request.POST)
-        if task_form.is_valid():
-            new_task = task_form.save(commit=False)
-            new_task.author = request.user
-            task_form.save()
-            messages.success(request, 'Task created successfully!')
-            return redirect('dashboard')
-        else:
-            messages.error(request, 'There were problems with creating the task.')
-    else:
-        users = User.objects.all().exclude(id=request.user.id)
+    users = User.objects.all().exclude(id=request.user.id)
     return render(request,
                   'administration.html',
                   {'users': users,
@@ -168,11 +174,17 @@ def assign_to_me(request):
     if request.method == 'POST':
         try:
             values = json.loads(request.body)
-            task = Task.objects.get(id=values['task_id'])
+            try:
+                task = Task.objects.get(id=values['task_id'])
+            except ObjectDoesNotExist as e:
+                return HttpResponseNotFound(f"Task does not exist")
             if values['user_id'] == 'None':
                 task.assignee = None
             else:
-                user = User.objects.get(id=values['user_id'])
+                try:
+                    user = User.objects.get(id=values['user_id'])
+                except ObjectDoesNotExist as e:
+                    return HttpResponseNotFound(f"User does not exist")
                 task.assignee = user
             task.save()
             if values['user_id'] == 'None':
@@ -187,15 +199,20 @@ def assign_to_me(request):
                        'status': 100}
 
         return JsonResponse(payload)
+    else:
+        return HttpResponseNotFound(f"Method not allowed")
 
 
 @group_required('Admin', 'Manager')
 @login_required
 def delete_task(request, task_id):
     try:
-        task = Task.objects.get(id=task_id)
+        try:
+            task = Task.objects.get(id=task_id)
+        except ObjectDoesNotExist as e:
+            return HttpResponseNotFound(f"Task does not exist")
         task.delete()
-        messages.success(request, 'Task created successfully!')
+        messages.success(request, 'Task deleted successfully!')
     except Exception:
         messages.error(request, 'There was a problem with deleting the task!')
     return render(request,

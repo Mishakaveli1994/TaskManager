@@ -145,7 +145,7 @@
                                     <p class="remaining">{{ remaining }}H
                                 {% endif %}
                             {% endwith %}
-                            <p class="logged">{{ task.tracked_time }}H</p>
+                            <p class="logged-hours">{{ task.tracked_time }}H</p>
                         </div>
                     </div>
                     <div id="tracked-time">
@@ -324,7 +324,6 @@
                 let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
                 try {
                     let assignee = document.querySelector('a.assignee')
-                    console.log(assignee)
                     if (assignee === null){
                         throw new Error('No assignee, can\'t change Task status')
                     }
@@ -333,7 +332,7 @@
                         'status': document.querySelector('.inner-field .status').innerText.toLowerCase(),
                         'resolution': document.querySelector('.inner-field .resolution').innerText.toLowerCase(),
                         'assignee': document.querySelector('a.assignee').innerText,
-                        'logged': document.querySelector('p.logged').innerText.slice(0, -1),
+                        'logged': document.querySelector('p.logged-hours').innerText.slice(0, -1),
                         'title': document.querySelector('.container h1').innerText,
                         'description': document.querySelector('textarea').value,
                     }

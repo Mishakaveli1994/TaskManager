@@ -1,7 +1,8 @@
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
@@ -68,7 +69,10 @@ def register(request):
 
 @login_required
 def edit(request, slug):
-    current_user = User.objects.get(username=slug)
+    try:
+        current_user = User.objects.get(username=slug)
+    except ObjectDoesNotExist as e:
+        return HttpResponseNotFound(f"User does not exist")
     profile_photo = ''
     if current_user.profile.photo:
         profile_photo = current_user.profile.photo.url
@@ -119,8 +123,10 @@ def update_user_group(request):
     if request.method == 'POST':
         try:
             values = json.loads(request.body)
-            print(values['newGroup'])
-            user = User.objects.get(username=values['userSlug'])
+            try:
+                user = User.objects.get(username=values['userSlug'])
+            except ObjectDoesNotExist as e:
+                return HttpResponseNotFound(f"User does not exist")
             group = Group.objects.get(name=values['newGroup'])
             user.groups.clear()
             user.groups.add(group)
@@ -137,6 +143,8 @@ def update_user_group(request):
                        'status': 100}
 
         return JsonResponse(payload)
+    else:
+        return HttpResponseNotFound(f"Method not allowed")
 
 
 @login_required
@@ -144,7 +152,10 @@ def delete_user(request):
     if request.method == 'POST':
         try:
             values = json.loads(request.body)
-            user = User.objects.get(username=values['userSlug'])
+            try:
+                user = User.objects.get(username=values['userSlug'])
+            except ObjectDoesNotExist as e:
+                return HttpResponseNotFound(f"User does not exist")
             user.delete()
             payload = {'message': 'User successfully deleted',
                        'status': 200}
@@ -154,4 +165,6 @@ def delete_user(request):
                        'status': 100}
 
         return JsonResponse(payload)
+    else:
+        return HttpResponseNotFound(f"Method not allowed")
 
