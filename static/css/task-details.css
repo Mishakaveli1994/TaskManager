@@ -161,6 +161,7 @@ div.assignee {
 .unassigned,
 .subtasks a{
     flex-basis: 35% !important;
+    text-decoration: none;
 }
 
 .subtasks a{
