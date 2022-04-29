@@ -159,7 +159,7 @@ div.assignee {
 
 .assigned,
 .unassigned{
-    flex-basis: 35%;
+    flex-basis: 35% !important;
 }
 
 .subtask {
