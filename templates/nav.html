@@ -29,6 +29,9 @@
                     <li class="user {% if section == 'profile' %}selected{% endif %}"><a class="nav-link"
                                                                                          href="{% url 'profile' user.username %}">Profile</a>
                     </li>
+                    <li class="user {% if section == 'about' %}selected{% endif %}"><a class="nav-link"
+                                                                                       href="{% url 'about' %}">About</a>
+                    </li>
                     <li class="user"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
                 </ul>
             </div>
@@ -46,7 +49,8 @@
                                                                                            href="{% url 'register' %}">Register</a>
                     </li>
                     <li class="guest {% if section == 'about' %}selected{% endif %}"><a class="nav-link"
-                                                                                        href="">About</a></li>
+                                                                                        href="{% url 'about' %}">About</a>
+                    </li>
                 </ul>
             </div>
         {% endif %}

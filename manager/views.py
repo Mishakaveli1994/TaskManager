@@ -108,6 +108,12 @@ def index(request):
                   {'section': 'index'})
 
 
+def about(request):
+    return render(request,
+                  'about.html',
+                  {'section': 'about'})
+
+
 @login_required
 def task_details(request, task_id):
     if request.method == 'GET':
