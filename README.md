@@ -7,7 +7,6 @@
 
 * [Django](https://www.djangoproject.com/)
 
-
 <!-- GETTING STARTED -->
 ## Getting Started
 
@@ -44,14 +43,6 @@
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
 <!-- ROADMAP -->
 ## Possible actions
 
@@ -63,6 +54,16 @@
 - [x] Administer Users
 - [ ] Search for Tasks (not implemented)
 - [ ] Projects Board (not implemented)
+
+## Additional Info
+
+### Pre-created users for testing
+
+- [x] User: admin - administrator privileges
+- [x] User: manager - manager privileges
+- [x] User: employee - employee privileges
+
+#### Password for all users - Softuni2022
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
