@@ -163,6 +163,10 @@ div.assignee {
     flex-basis: 35% !important;
 }
 
+.subtasks a{
+    padding: 5px 0 0 0;
+}
+
 .subtask {
     display: flex;
     align-items: center;
