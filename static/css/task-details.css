@@ -152,7 +152,8 @@ div.assignee {
     flex-basis: 15%;
 }
 
-.subtasks a{
+.subtasks-header p:nth-child(1),
+.subtasks-header p:nth-child(4){
     flex-basis: 35%;
 }
 
@@ -166,6 +167,7 @@ div.assignee {
     align-items: center;
 }
 
+.subtasks a,
 .task-details-right a {
     padding: 5px 0 0 0;
     text-decoration: none;
