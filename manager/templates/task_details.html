@@ -201,9 +201,9 @@
             let trackTimeBtn = document.getElementById("track-time-btn")
             let assignee = "{{ task.assignee }}"
 
-            document.getElementById('create-new-subtask').addEventListener('click', (ev)=>{
+            document.getElementById('create-new-subtask').addEventListener('click', (ev) => {
                 let authorized = "{% if request.user|has_group:"Admin" or request.user == task.author %}yes{% else %}no{% endif %}"
-                if (authorized === 'no'){
+                if (authorized === 'no') {
                     tempAlert('You are not authorized to create new subtasks', 2000, 100);
                     ev.preventDefault()
                 }
@@ -246,20 +246,23 @@
                     let request = await assignToMe("{% url 'assign_to_me' %}", "{{task.id}}", "None")
                     tempAlert(request.message, 2000, request.status);
                     ev.target.remove()
-                    let trackTimeBtn = document.getElementById('track-time-btn')
-                    let updateTaskBtn = document.getElementById('update-task')
-                    if (trackTimeBtn) {
-                        trackTimeBtn.remove()
-                    }
-                    if (updateTaskBtn) {
-                        updateTaskBtn.remove()
-                    }
                     assignee = "None"
-                    let statusOptions = document.getElementById('status-options')
-                    let resolutionOptions = document.getElementById('resolution-options')
+                    let userAuthorized = '{% if request.user == task.author or request.user|has_group:"Admin" %}yes{% else %}no{% endif %}'
+                    if (userAuthorized === 'no') {
+                        let statusOptions = document.getElementById('status-options')
+                        let resolutionOptions = document.getElementById('resolution-options')
+                        statusOptions.remove()
+                        resolutionOptions.remove()
+                        let trackTimeBtn = document.getElementById('track-time-btn')
+                        let updateTaskBtn = document.getElementById('update-task')
+                        if (trackTimeBtn) {
+                            trackTimeBtn.remove()
+                        }
+                        if (updateTaskBtn) {
+                            updateTaskBtn.remove()
+                        }
+                    }
 
-                    statusOptions.remove()
-                    resolutionOptions.remove()
 
                 } else if (ev.target.id === 'assign-me') {
                     if (assignee === "{{ user.username }}") {
@@ -281,7 +284,16 @@
 
                     document.getElementById('delete-assignee-btn').innerHTML = '<button id="remove-assignee">Remove assignee</button>'
 
-                    document.getElementById('update-container').innerHTML = '<button id="update-task">Update Task</button>'
+                    let userAuthorized = '{% if request.user == task.author or request.user|has_group:"Admin" %}yes{% else %}no{% endif %}'
+                    if (userAuthorized === 'yes'){
+                        document.getElementById('update-container').innerHTML = '<button id="update-task">Update Task</button>' +
+                            '<button id="delete-task">Delete Task</button>'
+                        let deleteTaskBtn = document.getElementById('delete-task')
+                        deleteTaskBtn.addEventListener('click', deleteTask)
+                    }else{
+                        document.getElementById('update-container').innerHTML = '<button id="update-task">Update Task</button>'
+                    }
+
 
                     let trackBtn = document.createElement('button')
                     let updateTaskBtn = document.getElementById('update-task')
@@ -295,14 +307,18 @@
                     }
                     let resolutionField = document.querySelector('#resolution').querySelector('.inner-field')
                     let statusField = document.querySelector('#status').querySelector('.inner-field')
-                    resolutionField.innerHTML += '<a href="#" id="resolution-options" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>';
-                    statusField.innerHTML += '<a href="#" id="status-options" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>';
-                    editMenu = document.querySelectorAll(".inner-field a");
-                    [...editMenu].map(x => x.addEventListener("click", openMenu));
-                    menuMap = {
-                        'status-dropdown': document.querySelector('.inner-field .status'),
-                        'priority-dropdown': document.querySelector('.inner-field .priority'),
-                        'resolution-dropdown': document.querySelector('.inner-field .resolution'),
+
+                    let statusOptions = document.querySelector('#status-options')
+                    if (statusOptions === null) {
+                        resolutionField.innerHTML += '<a href="#" id="resolution-options" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>';
+                        statusField.innerHTML += '<a href="#" id="status-options" class="dropdown"><i class="fa-solid fa-pencil dropdown"></i></a>';
+                        editMenu = document.querySelectorAll(".inner-field a");
+                        [...editMenu].map(x => x.addEventListener("click", openMenu));
+                        menuMap = {
+                            'status-dropdown': document.querySelector('.inner-field .status'),
+                            'priority-dropdown': document.querySelector('.inner-field .priority'),
+                            'resolution-dropdown': document.querySelector('.inner-field .resolution'),
+                        }
                     }
                 }
             }
@@ -310,10 +326,15 @@
             async function updateTask(ev) {
                 let csrf_token = document.querySelector('input[name="csrfmiddlewaretoken"]').value
                 try {
+                    let assignee = document.querySelector('a.assignee')
+                    console.log(assignee)
+                    if (assignee === null){
+                        throw new Error('No assignee, can\'t change Task status')
+                    }
                     let data = {
-                        'priority': document.querySelector('.inner-field .priority').innerText,
-                        'status': document.querySelector('.inner-field .status').innerText,
-                        'resolution': document.querySelector('.inner-field .resolution').innerText,
+                        'priority': document.querySelector('.inner-field .priority').innerText.toLowerCase(),
+                        'status': document.querySelector('.inner-field .status').innerText.toLowerCase(),
+                        'resolution': document.querySelector('.inner-field .resolution').innerText.toLowerCase(),
                         'assignee': document.querySelector('a.assignee').innerText,
                         'logged': document.querySelector('p.logged').innerText.slice(0, -1),
                         'title': document.querySelector('.container h1').innerText,
@@ -332,7 +353,7 @@
                     console.log(await request.json());
                     [...document.querySelectorAll('.bold')].map(x => x.classList.remove('bold'))
                 } catch (e) {
-                    tempAlert('No assignee, can\'t change Task status', 2000, 100);
+                    tempAlert(e.message, 2000, 100);
                 }
 
             }

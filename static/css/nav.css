@@ -1,13 +1,3 @@
-* {
-    margin: 0;
-    padding: 0;
-    font-family: "proxima-nova", Sans-serif;
-}
-
-body {
-    margin: 0 50px;
-}
-
 #nav-bar {
     display: flex;
     background: #18596D;

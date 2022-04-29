@@ -1,5 +1,15 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "proxima-nova", Sans-serif;
+}
+
+body {
+    margin: 0 50px;
+}
+
 .centered {
-    position: fixed;
+    position: absolute;
     top: 50px;
     left: 50%;
     /* bring your own prefixes */
@@ -61,6 +71,6 @@
     padding: 20px 50px;
     border-radius: 8px;
     transform: translate(-50%, 0%);
-    color:white;
+    color: white;
     font-weight: bold;
 }

@@ -8,10 +8,16 @@
 {% block content %}
     <div class="form-field centered">
         <h1>Create Task</h1>
-            <p>Please, use the following form to create a task.</p>
+        <p>Please, use the following form to create a task.</p>
         <div>
             <form method="post">
-                {{ task_form.as_p }}
+                <p>Title: {{ task_form.title }}</p>
+                <div id="description-field">
+                    <p>Description:</p>
+                    {{ task_form.description }}
+                </div>
+                <p>Priority: {{ task_form.priority }}</p>
+                <p>Estimate: {{ task_form.estimate }}</p>
                 {% csrf_token %}
                 <p><input type="submit" value="Create Task"></p>
             </form>

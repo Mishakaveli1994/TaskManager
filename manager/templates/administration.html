@@ -63,6 +63,7 @@
             let selects = document.querySelectorAll(".position");
             let userRows = document.querySelectorAll(".user-row");
 
+
             [...selects].map(x => x.addEventListener("change", changePosition));
             [...userRows].map(x => x.addEventListener("click", modifyData));
 
@@ -73,8 +74,8 @@
                 let saveBtnTr = currentUserRow.querySelector('.save-changes-btn')
 
                 if (ev.target.tagName === 'BUTTON') {
+                    let select = ev.target.parentNode.parentNode.querySelector('.position');
                     if (ev.target.className.includes('reset-user-group')) {
-                        let select = ev.target.parentNode.parentNode.querySelector('.position');
                         let defaultValue = select.getAttribute('data-initial');
                         [...select.querySelectorAll('option')].map(e => e.value === defaultValue ? e.selected = true : '')
                         select.classList.remove('highlighted')
@@ -90,6 +91,7 @@
                             newGroupTr.classList.remove('highlighted')
                             resetBtnTr.childNodes[1].remove()
                             saveBtnTr.childNodes[1].remove()
+                            select.setAttribute('data-initial', newGroup.toLowerCase());
                         }
                     } else if (ev.target.className.includes('delete-user')) {
                         let user = ev.target.parentNode.parentNode.querySelector('.user-slug').innerText

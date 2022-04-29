@@ -121,18 +121,24 @@ def task_details(request, task_id):
 def update_task(request, task_id):
     task = Task.objects.get(id=task_id)
     if request.method == 'POST':
-        task_values = json.loads(request.body)
-        task.priority = task_values['priority']
-        task.status = task_values['status']
-        task.resolved = task_values['resolution']
-        assignee = User.objects.get(username=task_values['assignee'])
-        task.assignee = assignee
-        task.logged = task_values['logged']
-        task.title = task_values['title']
-        task.description = task_values['description']
-        task.save()
-        payload = {'status': 'Task successfully updated'}
-        return JsonResponse(payload)
+        try:
+            task_values = json.loads(request.body)
+            task.priority = task_values['priority']
+            task.status = task_values['status']
+            task.resolved = task_values['resolution']
+            assignee = User.objects.get(username=task_values['assignee'])
+            task.assignee = assignee
+            task.logged = task_values['logged']
+            task.title = task_values['title']
+            task.description = task_values['description']
+            task.full_clean()
+            task.save()
+            payload = {'status': 'Task successfully updated'}
+            return JsonResponse(payload)
+        except Exception as err:
+            payload = {'status': 'Task update failed',
+                       'message':str(err)}
+            return JsonResponse(payload)
 
 
 @group_required('Admin')
@@ -183,7 +189,9 @@ def assign_to_me(request):
         return JsonResponse(payload)
 
 
-def delete_task(request,task_id):
+@group_required('Admin', 'Manager')
+@login_required
+def delete_task(request, task_id):
     try:
         task = Task.objects.get(id=task_id)
         task.delete()

@@ -125,7 +125,9 @@ def update_user_group(request):
             user.groups.clear()
             user.groups.add(group)
             user.profile.position = values['newGroup'].lower()
+            user.full_clean()
             user.save()
+            user.profile.full_clean()
             user.profile.save()
             payload = {'message': 'User successfully updated',
                        'status': 200}

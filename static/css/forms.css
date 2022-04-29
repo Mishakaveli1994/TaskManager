@@ -1,6 +1,19 @@
-form label {
-    margin: 20px 0 5px 0;
-    display: block;
+label[for=photo-clear_id] {
+    display: inline;
+    margin: 10px 0
+}
+
+#photo-clear_id {
+    display: inline;
+}
+
+#photo-field{
+    display: flex;
+    flex-direction: column;
+}
+
+p{
+    margin:5px 0;
 }
 
 form.edit-profile {
