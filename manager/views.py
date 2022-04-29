@@ -38,12 +38,7 @@ def tasks_listing(request):
     per_page = request.GET.get("per_page", 11)
     user = request.user
     tasks = ''
-    if user.groups.filter(name='Admin').exists():
-        tasks = Task.objects.all().order_by('-updated')
-    elif user.groups.filter(name='Manager').exists():
-        tasks = Task.objects.all().filter(author=user.id).order_by('-updated')
-    elif user.groups.filter(name='Employee').exists():
-        tasks = Task.objects.all().filter(Q(assignee=None) | Q(assignee=user.id)).order_by('-updated')
+    tasks = Task.objects.all().order_by('-updated')
     paginator = Paginator(tasks, per_page)
     page_obj = paginator.get_page(page_number)
     data = [{'id': kw.id,
