@@ -13,3 +13,7 @@ def has_group(user, group_name):
 @register.filter(name='sub')
 def sub(a, b):
     return a - b
+
+@register.filter
+def replace_underscore(value):
+    return value.replace("_"," ")

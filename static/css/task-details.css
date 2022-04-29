@@ -158,7 +158,8 @@ div.assignee {
 }
 
 .assigned,
-.unassigned{
+.unassigned,
+.subtasks a{
     flex-basis: 35% !important;
 }
 
@@ -167,7 +168,6 @@ div.assignee {
     align-items: center;
 }
 
-.subtasks a,
 .task-details-right a {
     padding: 5px 0 0 0;
     text-decoration: none;

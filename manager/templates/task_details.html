@@ -169,7 +169,7 @@
                 {% for task in subtasks %}
                     <div class="subtask">
                         <a href="/tasks/{{ task.id }}">{{ task|truncatechars:70 }}</a>
-                        <p class="{{ task.status|join:"-" }}">{{ task.status|title }}</p>
+                        <p class="{{ task.status.split|join:"-" }}">{{ task.status|replace_underscore|title }}</p>
                         <p class="{{ task.priority }}">{{ task.priority|title }}</p>
                         {% if task.assignee %}
                             <a class="assigned" href="/account/profile/{{ task.assignee }}">{{ task.assignee }}</a>
